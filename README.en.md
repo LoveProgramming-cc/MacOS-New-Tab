@@ -64,7 +64,7 @@ Released under the [GNU General Public License v3.0](LICENSE).
 Copyright © 2026 koen
 Portions derived from Webintosh / Webintosh-Desktop remain the copyright of their original authors.
 
-You may use, modify and redistribute this project, provided that redistribution is also under GPL-3.0 with complete source code and keeps the copyright and origin notices above.
+This project is for learning and research only and has no commercial purpose. Redistribution must also be under GPL-3.0 with complete source code and keep the copyright and origin notices above.
 
 ### Material not covered by the GPL
 
@@ -73,4 +73,4 @@ Some material in this repository does not belong to the author, and the GPL gran
 - **Apple's material**: the macOS wallpapers, application icons and Finder icons under `assets/`, and the SF Pro and PingFang SC fonts, are the property of Apple Inc.
 - **The "Hoshino" desktop pet**: the character in `plugin/examples/hoshino-pet/` is from Blue Archive, © NEXON Games and Yostar. It is an unofficial fan-made example.
 
-They are included for learning and demonstration only. Replace them before redistributing or using this project commercially. Rights holders who object can open an issue and the material will be removed.
+They are included for learning and demonstration only and **must not be used for any commercial purpose**. Rights holders who object can open an issue and the material will be removed.
