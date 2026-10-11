@@ -1,0 +1,76 @@
+<div id="stage" class="stage">
+  <!-- The paper plane. Its colours come from the letter's paper. -->
+  <div id="plane" class="plane" hidden>
+    <div id="plane-art" class="plane-art">
+      <svg viewBox="0 0 120 72" aria-hidden="true">
+        <polygon class="p-far" points="4,10 38,37 26,44"/>
+        <polygon class="p-top" points="4,10 116,37 38,37"/>
+        <polygon class="p-keel" points="38,37 116,37 50,60"/>
+        <polyline class="p-crease" points="4,10 116,37"/>
+      </svg>
+    </div>
+    <div id="badge" class="badge" hidden>✉︎</div>
+  </div>
+  <div id="bubble" class="bubble" hidden></div>
+
+  <!-- Writing a letter -->
+  <section id="compose" class="card paper" hidden>
+    <header class="card-head grab">
+      <div>
+        <div class="card-title" data-t="composeTitle">To the future me</div>
+        <div id="compose-date" class="card-sub"></div>
+      </div>
+      <button class="x" type="button" data-act="hide">×</button>
+    </header>
+    <textarea id="text" class="lines" maxlength="2000"></textarea>
+    <div class="label" data-t="whenLabel">When should it land?</div>
+    <div id="delays" class="chips"></div>
+    <div class="card-foot">
+      <div id="papers" class="papers"></div>
+      <button id="fold" class="primary" type="button" data-t="fold">Fold it into a plane</button>
+    </div>
+  </section>
+
+  <!-- Reading a letter that has landed -->
+  <section id="letter" class="card paper" hidden>
+    <header class="card-head grab">
+      <div>
+        <div id="letter-title" class="card-title"></div>
+        <div id="letter-sub" class="card-sub"></div>
+      </div>
+      <button class="x" type="button" data-act="close-letter">×</button>
+    </header>
+    <div id="letter-body" class="lines body"></div>
+    <div id="refly" class="refly" hidden>
+      <div class="label" data-t="reflyLabel">Send it on again — when should it land?</div>
+      <div id="refly-delays" class="chips"></div>
+    </div>
+    <div class="card-foot">
+      <button id="letter-delete" class="plain danger" type="button" data-t="delete" hidden>Delete</button>
+      <span class="grow"></span>
+      <button id="letter-refly" class="plain" type="button" data-t="refly">Fly it again</button>
+      <button id="letter-keep" class="primary" type="button" data-t="keep">Keep in mailbox</button>
+    </div>
+  </section>
+
+  <!-- The mailbox -->
+  <section id="mailbox" class="card desk" hidden>
+    <header class="card-head grab">
+      <div>
+        <div class="card-title" data-t="mailbox">Mailbox</div>
+        <div id="mailbox-sub" class="card-sub"></div>
+      </div>
+      <button class="x" type="button" data-act="hide">×</button>
+    </header>
+    <div class="box-scroll">
+      <div class="label" data-t="received">Landed</div>
+      <div id="received" class="box-list"></div>
+      <div class="label" data-t="inFlight">Still in the air</div>
+      <div id="flying" class="box-list"></div>
+    </div>
+    <div class="card-foot">
+      <span class="grow"></span>
+      <button class="primary" type="button" data-act="compose" data-t="writeNew">Write a letter</button>
+    </div>
+  </section>
+</div>

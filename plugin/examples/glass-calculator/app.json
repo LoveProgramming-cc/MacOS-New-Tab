@@ -1,0 +1,81 @@
+{
+  "id": "glass-calculator",
+  "name": "Calculator",
+  "version": "4.1.1",
+  "kind": "app",
+  "runtime": "native",
+  "description": "Calculator built entirely from host-rendered native controls. Reference app for the Native App SDK.",
+  "icon": "assets/icon.png",
+  "permissions": [
+    "storage",
+    "clipboard"
+  ],
+  "window": {
+    "width": 264,
+    "height": 467,
+    "minWidth": 264,
+    "minHeight": 467,
+    "resizable": false,
+    "appearance": "dark",
+    "material": "glass",
+    "titlebarHeight": 44,
+    "showTitle": false,
+    "borderRadius": 14
+  },
+  "entry": {
+    "ui": "src/ui.json",
+    "script": "src/main.js"
+  },
+  "locales": {
+    "en-US": "locales/en-US.json",
+    "zh-CN": "locales/zh-CN.json",
+    "ja-JP": "locales/ja-JP.json",
+    "ar": "locales/ar.json",
+    "ko-KR": "locales/ko-KR.json"
+  },
+  "menus": [
+    {
+      "title": "Edit",
+      "titleKey": "menuEdit",
+      "items": [
+        {
+          "label": "Copy Result",
+          "labelKey": "copyResult",
+          "command": "copy-result",
+          "shortcut": "⌘C"
+        },
+        {
+          "separator": true
+        },
+        {
+          "label": "Clear",
+          "labelKey": "clear",
+          "command": "clear",
+          "shortcut": "⌥⌫"
+        }
+      ]
+    },
+    {
+      "title": "View",
+      "titleKey": "menuView",
+      "items": [
+        {
+          "label": "Match System",
+          "labelKey": "appearanceSystem",
+          "command": "appearance-system"
+        },
+        {
+          "label": "Light",
+          "labelKey": "appearanceLight",
+          "command": "appearance-light"
+        },
+        {
+          "label": "Dark",
+          "labelKey": "appearanceDark",
+          "command": "appearance-dark"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

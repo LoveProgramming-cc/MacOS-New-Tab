@@ -1,0 +1,465 @@
+/* One geometry system, Dock utilities and Trash, glass compositing, first paint.
+   The stylesheets are loaded in the order of their numbers; later files refine earlier ones. */
+/* V45 — one geometry system, Dock utilities/Trash, compact Notification Center and richer widget editing */
+:root { --system-radius: 12px; }
+.window:not(#spotlight),
+.widget-card,
+.photo-widget-frame,
+.widget-gallery-shell,
+.widget-quick-editor-card,
+.launchpad-delete-card,
+.widget-placement-ghost,
+.widget-context-menu,
+.widget-context-submenu,
+.trash-finder-window,
+.mac-card,
+.dropdown-menu { border-radius: var(--system-radius) !important; }
+#spotlight { border-radius: 18px !important; }
+.settings-sidebar { border-start-start-radius: var(--system-radius)!important; border-start-end-radius: 0!important; border-end-end-radius: 0!important; border-end-start-radius: var(--system-radius)!important; }
+.settings-main { border-start-start-radius: 0!important; border-start-end-radius: var(--system-radius)!important; border-end-end-radius: var(--system-radius)!important; border-end-start-radius: 0!important; }
+
+/* Notification Center is exactly two small-widget columns. The panel itself has no plate. */
+.widget-center {
+    width: 364px !important;
+    right: 10px !important;
+    padding: 14px 10px 12px !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+.widget-center-list {
+    grid-template-columns: repeat(2, 160px) !important;
+    grid-auto-rows: 160px !important;
+    gap: 12px !important;
+    justify-content: end !important;
+    padding: 2px 6px 18px !important;
+    scrollbar-width: none !important;
+}
+.widget-center-list::-webkit-scrollbar { display: none !important; }
+.widget-center-list > .widget-size-small { grid-column: span 1 !important; }
+.widget-center-list > .widget-size-medium,
+.widget-center-list > .widget-size-large { grid-column: 1 / span 2 !important; }
+
+/* Edit badge overlaps the true upper-left edge like macOS rather than sitting inside. */
+.widget-card:has(> .widget-remove) { overflow: visible !important; }
+.widget-remove {
+    top: -10px !important;
+    left: -10px !important;
+    width: 23px !important;
+    height: 23px !important;
+    line-height: 19px !important;
+}
+
+/* Battery: only the ring is green; its center is a neutral solid/glass-colored disc. */
+.battery-ring::after {
+    inset: 9px !important;
+    background: rgba(218,218,222,.96) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+body.dark-mode .battery-ring::after { background: rgba(52,52,55,.97) !important; }
+.battery-ring:not(.active)::after {
+    background: transparent !important;
+    inset: 8px !important;
+    border: 7px solid rgba(128,128,138,.24) !important;
+}
+
+/* Context-menu geometry: arrows and checkmarks receive dedicated lanes. */
+.widget-context-item { box-sizing: border-box; padding-inline-start: 30px !important; padding-inline-end: 30px !important; }
+.widget-context-item:not(.selected):not(.widget-context-has-submenu) { padding-inline-start: 30px !important; }
+.widget-context-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.widget-context-chevron {
+    position: absolute !important;
+    right: 10px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    margin: 0 !important;
+    width: 12px;
+    text-align: center;
+}
+.widget-context-submenu .selected::before,
+.widget-context-menu > .selected::before {
+    content: '✓';
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    margin: 0 !important;
+    width: 12px;
+    text-align: center;
+}
+.widget-context-submenu:not(.floating-context-submenu) { left: calc(100% - 3px) !important; }
+
+/* Compact quick editor controls. */
+.widget-quick-editor-card { width: min(500px, calc(100vw - 40px)) !important; border-radius: var(--system-radius) !important; }
+.widget-quick-number { width: 110px; }
+.widget-quick-dependent.disabled { opacity: .45; }
+.widget-quick-check-row { margin: 0; }
+
+/* Dock utility zone: app side | folders | Trash. */
+.dock-separator {
+    width: 1px;
+    height: calc(var(--dock-size) * .76);
+    flex: 0 0 1px;
+    align-self: center;
+    margin: 0 7px 1px;
+    background: rgba(60,60,60,.46);
+    box-shadow: 1px 0 rgba(255,255,255,.26);
+    cursor: url('../assets/cursors/resizecursor.png') 8 8, ns-resize;
+    pointer-events: auto;
+}
+body.dark-mode .dock-separator { background: rgba(235,235,235,.38); box-shadow: 1px 0 rgba(0,0,0,.18); }
+body.dock-resizing, body.dock-resizing * { cursor: url('../assets/cursors/resizecursor.png') 8 8, ns-resize !important; user-select: none !important; }
+.dock-folder-icon img {
+    width: auto !important;
+    height: calc(var(--dock-size) * .88) !important;
+    max-width: calc(var(--dock-size) * 1.15) !important;
+    object-fit: contain !important;
+}
+.dock-trash-item .dock-icon img { object-fit: contain !important; }
+.dock-folder-item .app-icon-container,
+.dock-trash-item .app-icon-container { background: transparent !important; }
+
+/* Finder-like Trash window. */
+.trash-finder-window {
+    width: min(900px, calc(100vw - 80px));
+    height: min(560px, calc(100vh - 90px));
+    flex-direction: row !important;
+    overflow: hidden;
+    background: var(--solid-bg);
+    border: var(--mac-border-light);
+}
+.trash-finder-sidebar {
+    width: 220px;
+    flex: 0 0 220px;
+    padding: 14px 12px;
+    box-sizing: border-box;
+    border-inline-end: var(--mac-border-light) !important;
+    border-top: 0 !important; border-bottom: 0 !important; border-inline-start: 0 !important;
+}
+.trash-window-controls { margin-block: 0 26px; margin-inline: 2px 0; }
+.finder-side-section-label { margin: 10px 9px 5px; font-size: 11px; font-weight: 600; color: var(--text-muted); }
+.finder-side-item { display:flex; align-items:center; gap:9px; padding:7px 10px; border-radius:7px; font-size:13px; }
+.finder-side-item.active { background: rgba(128,128,132,.18); }
+.trash-finder-main { flex:1; min-width:0; display:flex; flex-direction:column; background:var(--solid-bg); }
+.trash-finder-toolbar { height:58px; display:flex; align-items:center; gap:18px; padding:0 12px; border-bottom:var(--mac-border); box-sizing:border-box; }
+.trash-toolbar-nav { color:var(--text-muted); font-size:29px; letter-spacing:8px; }
+.trash-toolbar-spacer { flex:1; }
+.trash-finder-subbar { height:28px; display:flex; align-items:center; padding:0 12px; font-size:12px; font-weight:600; border-bottom:var(--mac-border); }
+.trash-finder-grid { flex:1; overflow:auto; display:grid; grid-template-columns:repeat(auto-fill,100px); grid-auto-rows:116px; align-content:start; gap:12px 18px; padding:24px; box-sizing:border-box; }
+.trash-file-tile { display:flex; flex-direction:column; align-items:center; gap:7px; min-width:0; }
+.trash-file-icon { width:70px; height:70px; display:grid; place-items:center; }
+.trash-file-icon .app-icon-container { width:64px !important; height:64px !important; }
+.trash-file-name { max-width:96px; font-size:11px; text-align:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.trash-empty-message { grid-column:1 / -1; align-self:center; justify-self:center; color:var(--text-muted); font-size:13px; }
+.trash-finder-statusbar { height:28px; border-top:var(--mac-border); display:flex; justify-content:center; align-items:center; color:var(--text-muted); font-size:11px; }
+
+/* Screen Time: square favicons and native-like small/medium/large compositions. */
+.screen-time-site-icon,
+.screen-time-manager-site-icon {
+    aspect-ratio: 1 / 1 !important;
+    object-fit: contain !important;
+    height: auto !important;
+    flex: 0 0 auto;
+}
+.screen-time-site-icon { width: 19px !important; }
+.screen-time-manager-site-icon { width: 28px !important; }
+.screen-time-small-layout { flex:1; min-height:0; display:flex; }
+.screen-time-small-layout .screen-time-hourly-chart { flex:1; height:auto !important; min-height:72px; }
+.screen-time-medium-layout { grid-template-columns: minmax(0,1fr) 112px !important; }
+.screen-time-large-layout {
+    flex:1;
+    min-height:0;
+    display:grid;
+    grid-template-rows:minmax(0, 1fr) auto;
+    gap:12px;
+}
+.screen-time-large-layout > .screen-time-hourly-chart { height:auto !important; min-height:145px; }
+.screen-time-large-sites {
+    border-inline-start:0 !important;
+    border-top:1px solid rgba(128,128,132,.18);
+    padding:10px 0 0 !important;
+    display:grid !important;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px 16px !important;
+}
+.widget-size-large .screen-time-total { font-size:29px; }
+.screen-time-manager-site-row { grid-template-columns:28px minmax(0,1fr) 86px 86px !important; }
+.screen-time-manager-card, .screen-time-sites-card { overflow: hidden; }
+
+/* Developer Beta 0.55.0: native horizontal Launchpad scrolling + CSS snap. */
+#launchpad-grid { scroll-snap-type:x mandatory !important; overscroll-behavior-x:contain; scroll-behavior:auto; }
+.launchpad-page { scroll-snap-align:start !important; transform:none !important; }
+
+/* Desktop contextual menu shares the same acrylic material as widget menus. */
+.desktop-context-menu { width: 224px; }
+
+/* Keep the transparent drag preview / placement ghost distinct from the widget itself. */
+.widget-placement-ghost { border-radius: var(--system-radius) !important; }
+.screen-time-site-icon { width:19px !important; height:19px !important; }
+.screen-time-manager-site-icon { width:28px !important; height:28px !important; }
+.dock-separator {
+    width: 11px !important;
+    flex-basis: 11px !important;
+    margin: 0 1px 1px !important;
+    background: linear-gradient(to right, transparent 5px, rgba(60,60,60,.46) 5px, rgba(60,60,60,.46) 6px, transparent 6px) !important;
+    box-shadow: none !important;
+}
+body.dark-mode .dock-separator {
+    background: linear-gradient(to right, transparent 5px, rgba(235,235,235,.38) 5px, rgba(235,235,235,.38) 6px, transparent 6px) !important;
+}
+.widget-center { width: 376px !important; }
+.widget-center-list { padding-inline-start: 12px !important; padding-inline-end: 12px !important; }
+.dock-trash-item .dock-icon img { width:100% !important; height:100% !important; object-fit:contain !important; }
+
+
+/* V46 — lifecycle-isolated widgets, full-height Notification Center and native glass interactions */
+:root { --system-radius: 12px; }
+
+/* Notification Center: no redundant date header; cards may use the full H range. */
+.widget-center { top: 30px !important; bottom: 8px !important; padding-top: 8px !important; }
+.widget-center-header { display: none !important; }
+.widget-center-list {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    align-content: start !important;
+    justify-content: end !important;
+    overflow-y: auto !important;
+    padding-top: 4px !important;
+    padding-bottom: 58px !important;
+}
+.widget-center-empty { display: none !important; }
+.widget-edit-btn { position: absolute !important; bottom: 8px; left: 50%; transform: translateX(-50%); z-index: 4; }
+
+/* Never fade the actual widget while it is moved; only the gray placement ghost moves separately. */
+.desktop-widget-dragging, .widget-center-dragging { opacity: 1 !important; filter: none !important; }
+
+/* When a Gallery drag targets the desktop, uncover the complete desktop until drop. */
+body.widget-drag-to-desktop #widget-gallery,
+body.widget-drag-to-desktop #widget-center { opacity: 0 !important; pointer-events: none !important; transition: opacity 90ms linear; }
+
+/* Make glass resilient when windows repeatedly change stacking contexts. */
+#spotlight.mac-acrylic,
+.widget-context-menu.mac-acrylic,
+.floating-context-submenu.mac-acrylic,
+.mac-dialog-card.mac-acrylic {
+    background-color: var(--acrylic-bg) !important;
+    backdrop-filter: blur(42px) saturate(178%) !important;
+    -webkit-backdrop-filter: blur(42px) saturate(178%) !important;
+    background-clip: padding-box !important;
+    -webkit-backface-visibility: hidden;
+}
+.floating-context-submenu {
+    position: fixed !important;
+    z-index: 10000030 !important;
+    display: flex !important;
+    flex-direction: column;
+    min-width: 150px;
+    padding: 5px !important;
+    left: 0;
+    top: 0;
+}
+.widget-context-has-submenu:hover > .widget-context-submenu:not(.floating-context-submenu) { display: none !important; }
+
+/* Finder Trash: acrylic sidebar can see wallpaper because the parent is transparent. */
+.trash-finder-window { background: transparent !important; }
+.trash-finder-sidebar {
+    background-color: var(--acrylic-bg) !important;
+    backdrop-filter: blur(42px) saturate(175%) !important;
+    -webkit-backdrop-filter: blur(42px) saturate(175%) !important;
+}
+.trash-finder-main { background: var(--solid-bg) !important; }
+.trash-file-tile { border-radius: 8px; padding: 5px; box-sizing: border-box; cursor: default; }
+.trash-file-tile.selected { background: rgba(var(--accent-rgb),.17); outline: 1px solid rgba(var(--accent-rgb),.32); }
+
+/* macOS-like in-app modal; no browser alert()/confirm() chrome. */
+.mac-dialog-overlay {
+    position: fixed; inset: 0; z-index: 10000060; display: grid; place-items: center;
+    background: rgba(0,0,0,.09); animation: macDialogIn .13s ease-out;
+}
+.mac-dialog-overlay.closing { opacity: 0; transition: opacity .13s ease; }
+.mac-dialog-card {
+    width: min(430px, calc(100vw - 38px)); min-height: 150px; box-sizing: border-box;
+    padding: 22px 22px 18px; display: flex; gap: 17px; align-items: flex-start;
+    border-radius: var(--system-radius) !important;
+}
+.mac-dialog-icon { width: 58px; height: 58px; object-fit: contain; flex: 0 0 auto; }
+.mac-dialog-body { flex:1; min-width:0; }
+.mac-dialog-title { font: 600 17px 'SFPro-Bold','PingFang-Bold'; margin: 2px 0 8px; }
+.mac-dialog-message { font-size: 14px; line-height: 1.35; }
+.mac-dialog-detail { margin-top: 10px; font-size: 12px; color: var(--text-muted); }
+.mac-dialog-actions { margin-top: 20px; display:flex; justify-content:flex-end; gap:10px; }
+.mac-dialog-actions .mac-btn { min-width: 92px; }
+.mac-dialog-confirm.danger { background:var(--accent) !important; color:white !important; }
+@keyframes macDialogIn { from { opacity:0; } to { opacity:1; } }
+
+/* Calendar widgets: red/neutral typography on the shared glass surface. */
+.widget-calendar { padding: 11px !important; }
+.calendar-month-grid { width:100%; height:100%; display:flex; flex-direction:column; min-width:0; }
+.calendar-month-label { color:#ff3b30; font-size:10px; font-weight:700; letter-spacing:.25px; margin-bottom:5px; }
+.calendar-weekdays, .calendar-dates { display:grid; grid-template-columns:repeat(7,1fr); text-align:center; gap:2px 1px; }
+.calendar-weekdays { font-size:8px; font-weight:600; opacity:.72; margin-bottom:3px; }
+.calendar-dates { font-size:8.5px; line-height:16px; flex:1; align-content:start; }
+.calendar-dates span { min-width:0; height:16px; display:grid; place-items:center; }
+.calendar-dates .today { width:16px; justify-self:center; border-radius:50%; background:#ff3b30; color:#fff; font-weight:700; }
+.calendar-medium-layout { display:grid; grid-template-columns: 42% 58%; width:100%; height:100%; gap:8px; }
+.calendar-upnext-date { display:flex; flex-direction:column; min-width:0; }
+.calendar-weekday { color:#ff3b30; font-size:9px; font-weight:700; letter-spacing:.2px; }
+.calendar-day-number { font-size:34px; line-height:1.05; font-weight:400; margin-top:1px; }
+.calendar-no-events { margin-top:auto; padding-bottom:8px; font-size:10px; color:var(--text-muted); }
+.widget-size-medium.widget-calendar .calendar-month-label { font-size:9px; }
+.widget-size-medium.widget-calendar .calendar-weekdays { font-size:7.5px; }
+.widget-size-medium.widget-calendar .calendar-dates { font-size:8px; line-height:14px; }
+.widget-size-medium.widget-calendar .calendar-dates span { height:14px; }
+
+/* Screen Time settings chart is intentionally compact, like System Settings. */
+.screen-time-manager-chart { height: 92px !important; margin-top: 8px !important; }
+.screen-time-hourly-chart.manager { height: 92px !important; }
+.screen-time-hourly-chart.manager .screen-time-hour-col { padding-bottom: 14px !important; }
+.screen-time-manager-week { height: 70px !important; margin-top: 8px !important; }
+
+/* V47 — first-paint, stable glass compositing, gallery lifecycle and contextual actions */
+
+/* The picker is centered when Notification Center was not open. If it was open,
+   keep the two-column center visible and reserve its width, like macOS. */
+body.widget-gallery-open:not(.widget-gallery-with-center) .widget-gallery-shell {
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    width: min(1040px, 88vw) !important;
+    min-width: 560px !important;
+}
+body.widget-gallery-open.widget-gallery-with-center .widget-gallery-shell {
+    left: 18px !important;
+    right: auto !important;
+    transform: none !important;
+    width: min(1040px, calc(94.5vw - 392px)) !important;
+}
+/* Starting a gallery drag always hides the picker. Notification Center is an
+   independent surface and remains visible if it was visible before editing. */
+body.widget-drag-to-desktop #widget-gallery {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transition: opacity 70ms linear !important;
+}
+body.widget-drag-to-desktop.widget-gallery-with-center #widget-center {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+/* Stable acrylic compositing. Desktop widgets use one dedicated pseudo-surface
+   instead of putting backdrop-filter on the moving/card box itself. This avoids
+   Chromium compositor tile seams appearing exactly on invisible widget-grid lines. */
+.window.mac-acrylic,
+#spotlight.mac-acrylic,
+.widget-gallery-shell.mac-acrylic,
+.widget-context-menu.mac-acrylic,
+.floating-context-submenu.mac-acrylic,
+.trash-finder-sidebar.mac-acrylic,
+.mac-dialog-card.mac-acrylic {
+    background-clip: padding-box !important;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+.widget-card {
+    isolation: isolate;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: var(--window-shadow) !important;
+}
+.widget-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    border-radius: inherit;
+    background: var(--acrylic-bg);
+    backdrop-filter: var(--blur-heavy);
+    -webkit-backdrop-filter: var(--blur-heavy);
+    background-clip: padding-box;
+}
+.desktop-widget-dragging { opacity: 1 !important; filter: none !important; }
+
+/* Fixed submenu must never inherit clipping or become visually transparent. */
+.floating-context-submenu {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    overflow: visible !important;
+    background-color: var(--acrylic-bg) !important;
+    border: var(--acrylic-border) !important;
+    box-shadow: var(--window-shadow) !important;
+    backdrop-filter: blur(42px) saturate(178%) !important;
+    -webkit-backdrop-filter: blur(42px) saturate(178%) !important;
+}
+.widget-context-item.disabled,
+.widget-context-item:disabled { opacity: .42; pointer-events: none; }
+.widget-context-item.danger .widget-context-label { color: #ff3b30; }
+.trash-context-menu { width: 210px; }
+.context-edit-highlight { outline: 2px solid rgba(var(--accent-rgb),.55); outline-offset: -2px; border-radius: 9px; }
+
+/* Finder sidebar must remain true acrylic even when the Finder body is opaque. */
+.trash-finder-sidebar.mac-acrylic {
+    background-color: var(--acrylic-bg) !important;
+    backdrop-filter: blur(42px) saturate(178%) !important;
+    -webkit-backdrop-filter: blur(42px) saturate(178%) !important;
+    background-clip: padding-box !important;
+}
+
+/* Screen-time limit overlay customization. */
+.limit-overlay-settings .limit-overlay-message-row { align-items: center; gap: 16px; }
+.limit-overlay-settings #screen-time-overlay-message { width: min(430px, 62%); }
+.limit-overlay-image-actions { display: flex; gap: 8px; align-items: center; }
+
+@media (max-width: 760px) {
+    body.widget-gallery-open:not(.widget-gallery-with-center) .widget-gallery-shell {
+        width: 94vw !important; min-width: 0 !important;
+    }
+}
+
+/* V47 final: floating submenus are viewport-positioned by JS, never by the nested-menu rule. */
+.floating-context-submenu.widget-context-submenu {
+    position: fixed !important;
+    left: auto;
+    top: auto;
+}
+body.dark-mode .widget-card,
+body.dark-mode .widget-weather,
+body.dark-mode .widget-screenTime,
+body.dark-mode .widget-battery,
+body.dark-mode .mac-widget-glass {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* V51 boot visual cache: paint the previous complete visible desktop immediately, then swap
+   to fully hydrated live surfaces in one frame. */
+.boot-widget-snapshot-layer {
+    z-index: 9 !important;
+    pointer-events: none !important;
+    opacity: 1;
+    transition: opacity 110ms linear;
+}
+.boot-widget-snapshot-layer .widget-card { pointer-events: none !important; }
+body.boot-widget-snapshot-active #desktop-widget-layer { opacity: 0; }
+#desktop-widget-layer { transition: opacity 90ms linear; }
+.boot-widget-snapshot-layer.retiring { opacity: 0; }
+
+/* V48 Gallery drag catcher: when the picker fades out, its former rectangle is a
+   real desktop drop target instead of an invisible hit-test shield. */
+body.widget-drag-to-desktop #widget-gallery,
+body.widget-drag-to-desktop #widget-gallery * {
+    pointer-events: none !important;
+}
+#widget-desktop-drop-catcher {
+    position: fixed;
+    inset: 0;
+    z-index: 849000;
+    background: transparent;
+    pointer-events: auto;
+}

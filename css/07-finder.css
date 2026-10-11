@@ -1,0 +1,126 @@
+/* Finder window; window animation and traffic lights.
+   The stylesheets are loaded in the order of their numbers; later files refine earlier ones. */
+/* ------------------------------------------------------------------------------
+   Finder window (Applications / Desktop / Dock / Trash)
+   ------------------------------------------------------------------------------ */
+.trash-finder-window { min-width: 560px; }
+.trash-finder-sidebar { padding: 14px 10px !important; display: flex; flex-direction: column; }
+.finder-sidebar-list { display: flex; flex-direction: column; gap: 1px; }
+.finder-side-section-label { margin: 6px 10px 4px; font-size: 11px; font-weight: 600; color: var(--text-muted); opacity: .85; }
+.finder-side-item { gap: 8px; padding: 5px 10px; border-radius: 6px; font-size: 13px; cursor: default; color: var(--text-main); }
+.finder-side-item:hover { background: rgba(128,128,132,.10); }
+.finder-side-item.active { background: rgba(128,128,132,.22); }
+.finder-side-icon { width: 17px; height: 17px; flex: 0 0 17px; }
+.finder-side-external { margin-inline-start: auto; font-size: 10px; color: var(--text-muted); }
+.trash-finder-toolbar { height: 52px !important; gap: 10px !important; padding-block: 0 0!important; padding-inline: 10px 12px!important; }
+.finder-nav { display: flex; gap: 2px; }
+.finder-tool-btn { appearance: none; display: grid; place-items: center; width: 30px; height: 28px; padding: 0; border: 0; border-radius: 6px; background: transparent; color: var(--text-muted); cursor: default; }
+.finder-tool-btn svg { width: 17px; height: 17px; }
+.finder-tool-btn:hover:not(:disabled) { background: rgba(128,128,132,.16); color: var(--text-main); }
+.finder-tool-btn:disabled { opacity: .32; }
+.finder-title { font-size: 15px; font-weight: 700; margin-inline-start: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.finder-view-switch { display: flex; padding: 2px; gap: 1px; border-radius: 7px; background: rgba(128,128,132,.12); }
+.finder-view-switch .finder-tool-btn { width: 30px; height: 24px; border-radius: 5px; }
+.finder-view-switch .finder-tool-btn.active { background: var(--card-bg); color: var(--text-main); box-shadow: 0 1px 3px rgba(0,0,0,.16); }
+.trash-finder-toolbar .mac-btn[hidden] { display: none !important; }
+.finder-search { display: flex; align-items: center; gap: 6px; width: 170px; height: 28px; padding: 0 8px; box-sizing: border-box; border-radius: 7px; background: rgba(128,128,132,.12); color: var(--text-muted); }
+.finder-search:focus-within { box-shadow: 0 0 0 3px rgba(var(--accent-rgb),.3); background: var(--input-bg); }
+.finder-search svg { width: 14px; height: 14px; flex: 0 0 14px; }
+.finder-search input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--text-main); font-size: 13px; user-select: text; -webkit-user-select: text; }
+.finder-search input::-webkit-search-cancel-button { -webkit-appearance: none; }
+.trash-finder-grid { grid-template-columns: repeat(auto-fill, 104px) !important; grid-auto-rows: 112px !important; gap: 8px 14px !important; padding: 18px 20px !important; justify-content: start; }
+/* macOS selection: a soft plate behind the icon and a blue pill behind the name. */
+.trash-file-tile { padding: 4px !important; gap: 4px !important; background: transparent !important; outline: 0 !important; }
+.trash-file-icon { width: 76px !important; height: 72px !important; border-radius: 8px; }
+.trash-file-name { max-width: 98px !important; padding: 1px 6px; border-radius: 5px; font-size: 12px !important; line-height: 1.35; }
+.trash-file-tile.selected .trash-file-icon { background: rgba(128,128,132,.24); }
+.trash-file-tile.selected .trash-file-name { background: color-mix(in srgb, var(--accent) 88%, #000); color: #fff; }
+.trash-finder-grid.list-view { display: block !important; padding: 0 !important; }
+.finder-list-header, .finder-list-row { display: grid !important; grid-template-columns: minmax(0, 1fr) 150px 150px; align-items: center; column-gap: 12px; padding: 0 16px !important; box-sizing: border-box; }
+.finder-list-header { position: sticky; top: 0; z-index: 1; height: 26px; border-bottom: var(--mac-border); background: var(--solid-bg); font-size: 11px; font-weight: 600; color: var(--text-muted); }
+.finder-list-row { flex-direction: row !important; height: 26px; margin: 0 8px; padding: 0 8px !important; border-radius: 6px !important; font-size: 13px; }
+.finder-list-row:nth-child(odd) { background: rgba(128,128,132,.07) !important; }
+.finder-list-row.selected { background: color-mix(in srgb, var(--accent) 88%, #000) !important; color: #fff; }
+.finder-list-row.selected .finder-list-cell { color: rgba(255,255,255,.82); }
+.finder-list-name { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.finder-list-name > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.finder-list-icon { width: 18px; height: 18px; flex: 0 0 18px; }
+.finder-list-icon .app-icon-container { width: 18px !important; height: 18px !important; }
+.finder-list-cell { font-size: 12px; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.finder-pathbar { height: 24px; display: flex; align-items: center; gap: 5px; padding: 0 12px; border-top: var(--mac-border); font-size: 11px; color: var(--text-muted); }
+.finder-pathbar img { width: 13px; height: 13px; object-fit: contain; }
+.finder-path-arrow { opacity: .6; }
+.trash-finder-statusbar { height: 24px !important; }
+
+/* Native UI additions: glass material, tinted glyph buttons, list sections / folders. */
+.plugin-native-glass { background: var(--native-glass, rgba(246,246,248,.72)) !important; -webkit-backdrop-filter: blur(30px) saturate(180%); backdrop-filter: blur(30px) saturate(180%); border: 1px solid var(--native-border); box-shadow: 0 10px 34px rgba(0,0,0,.20); }
+.plugin-app-window.plugin-app-force-dark .plugin-native-app-frame,
+body.dark-mode .plugin-app-window:not(.plugin-app-force-light) .plugin-native-app-frame { --native-glass: rgba(44,44,47,.74); }
+.plugin-native-button-icon.tinted { display: inline-block; background: currentColor; }
+.plugin-native-list.plain, .plugin-native-table.plain { border: 0; border-radius: 0; background: transparent; }
+.plugin-native-list.plain .plugin-native-list-row { border-bottom: 0; border-radius: 7px; }
+.plugin-native-list-header { position: absolute; left: 0; right: 0; box-sizing: border-box; display: flex; align-items: flex-end; padding: 0 10px 5px; font-size: 11px; font-weight: 600; color: var(--native-secondary); }
+.plugin-native-list-row.emphasis .plugin-native-list-title { color: var(--native-accent); font-weight: 600; }
+.plugin-native-list-row.selected.emphasis .plugin-native-list-title { color: #fff; }
+.plugin-native-list-disclosure { flex: 0 0 10px; margin-inline-end: -4px; font-size: 13px; color: var(--native-secondary); transition: transform .14s ease; }
+.plugin-native-list-disclosure.open { transform: rotate(90deg); }
+.plugin-native-list-row.selected .plugin-native-list-disclosure { color: rgba(255,255,255,.85); }
+
+/* Application window glass lives on a pseudo-element. Chromium does not apply a
+   backdrop-filter to descendants of an element that itself has one, so with the blur on
+   the window box, glass surfaces inside an app (floating bars, sheets) showed the content
+   behind them unblurred. */
+.plugin-app-window.mac-acrylic { background-color: transparent !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+.plugin-app-window::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none; background: var(--acrylic-bg); -webkit-backdrop-filter: var(--blur-heavy); backdrop-filter: var(--blur-heavy); }
+.plugin-app-window.plugin-app-material-solid::before { background: var(--solid-bg); -webkit-backdrop-filter: none; backdrop-filter: none; }
+.plugin-app-window.plugin-app-material-transparent::before { display: none; }
+body.dev-reduce-transparency .plugin-app-window::before, body.dev-transparent-glass .plugin-app-window::before { -webkit-backdrop-filter: none; backdrop-filter: none; }
+body.dev-reduce-transparency .plugin-native-glass { -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--acrylic-bg) !important; }
+/* Editing widgets hides every window, application windows included; they return untouched. */
+body.widget-gallery-open .plugin-app-window, body.widget-gallery-open .app-notification-stack { display: none !important; }
+
+/* Traffic lights reveal their glyphs while the pointer is over the group, as on macOS. */
+.window-controls .btn, .plugin-app-dot { position: relative; }
+.window-controls .btn::after, .plugin-app-dot::after { content: ""; position: absolute; inset: 0; background: center / 8px 8px no-repeat; opacity: 0; }
+.window-controls:hover .btn::after, .plugin-app-controls:hover .plugin-app-dot:not(:disabled)::after { opacity: 1; }
+.window-controls .btn.close::after, .plugin-app-dot.close::after { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath d='M1.6 1.6l4.8 4.8M6.4 1.6L1.6 6.4' stroke='%234d0000' stroke-opacity='.75' stroke-width='1.2' stroke-linecap='round'/%3E%3C/svg%3E"); }
+.window-controls .btn.minimize::after, .plugin-app-dot.minimize::after { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath d='M1.3 4h5.4' stroke='%23985700' stroke-opacity='.85' stroke-width='1.3' stroke-linecap='round'/%3E%3C/svg%3E"); }
+.window-controls .btn.maximize::after, .plugin-app-dot.maximize::after { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath d='M2 2.1h3.200L2 5.300zM6 5.900H2.800L6 2.700z' fill='%23006500' fill-opacity='.8'/%3E%3C/svg%3E"); }
+
+/* Dock: a dot under every application that is running. */
+.dock-item.running::before { content: ""; position: absolute; left: 50%; bottom: -7px; width: 4px; height: 4px; margin-inline-start: -2px; border-radius: 50%; background: var(--text-main); opacity: .78; pointer-events: none; }
+body.dark-mode .dock-item.running::before { background: #fff; }
+
+/* Rows dragged between native lists. */
+.plugin-native-drag-ghost { position: fixed; z-index: 960000; pointer-events: none; max-width: 240px; padding: 5px 10px; border-radius: 8px; background: rgba(var(--accent-rgb),.92); color: #fff; font: 600 12px -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 6px 18px rgba(0,0,0,.28); transform: translate(12px, 10px); }
+.plugin-native-list-row.drop-hover, .plugin-native-table-row.drop-hover { background: rgba(var(--accent-rgb),.22) !important; box-shadow: inset 0 0 0 2px var(--native-accent); border-radius: 7px; }
+.plugin-native-list-disclosure { align-self: stretch; display: grid; place-items: center; width: 18px; flex: 0 0 18px !important; margin: 0 -6px 0 -6px !important; cursor: default; }
+.plugin-menu-app-name { cursor: default; padding: 2px 8px; margin-block: 0 0!important; margin-inline: -8px 10px!important; border-radius: 5px; }
+.plugin-menu-app-name:hover, .plugin-menu-app-name.active { background: rgba(128,128,132,.28); }
+
+.plugin-app-menu-dropdown .menu-item.disabled { opacity: .38; pointer-events: none; }
+.plugin-app-menu-dropdown .menu-separator { height: 1px; margin: 4px 12px; background: rgba(128,128,132,.32); }
+
+/* ------------------------------------------------------------------------------
+   Windows: minimise / zoom animation, traffic lights, extra-feature entry points
+   ------------------------------------------------------------------------------ */
+/* Minimise and restore fly between the window and its Dock icon (window-manager.js). */
+.window-animating { pointer-events: none !important; will-change: translate, scale; }
+/* Zoom interpolates the frame itself, so the content re-lays out as the window grows. */
+.window-zooming { transition: left .28s cubic-bezier(.25,.8,.25,1), top .28s cubic-bezier(.25,.8,.25,1), width .28s cubic-bezier(.25,.8,.25,1), height .28s cubic-bezier(.25,.8,.25,1) !important; }
+.window.window-zoomed, .plugin-app-window.window-zoomed { max-width: none !important; max-height: none !important; }
+.window .window-controls .btn.minimize, .window .window-controls .btn.maximize { cursor: pointer; }
+.window .window-controls .btn.disabled, .window .window-controls .btn.disabled:hover { background-color: rgba(128,128,132,.38) !important; cursor: default; }
+.window .window-controls .btn.disabled::after { display: none; }
+
+/* “Disable extra features” removes every way in to widgets, applications and web time
+   management, as if they were not part of the system. */
+body.dev-disable-extra-features [data-extra-feature] { display: none !important; }
+body.dev-disable-extra-features #clock { cursor: default; }
+
+/* Developer page: nothing but the master switch is live while Developer Mode is off. */
+.developer-row-locked { opacity: .42; }
+.developer-row-locked .mac-custom-select, .developer-row-locked .mac-switch, .developer-row-locked .mac-btn { pointer-events: none; }
+
+.limit-builtin-settings { display: flex; flex-direction: column; gap: 10px; flex-shrink: 0; }
+.limit-builtin-settings[hidden] { display: none; }

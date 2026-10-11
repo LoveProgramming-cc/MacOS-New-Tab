@@ -1,0 +1,44 @@
+{
+  "id": "hoshino-pet",
+  "name": "Hoshino",
+  "version": "1.4.1",
+  "kind": "app",
+  "runtime": "web",
+  "description": "A desktop pet: Takanashi Hoshino keeps you company on the desktop. She stands on the Dock and on your windows, rides along when you drag them, falls when they go, looks at the pointer when it comes close — and holds a hand out when it snows in the Outside application.",
+  "icon": "assets/icon.png",
+  "accentColor": "pink",
+  "permissions": [
+    "storage",
+    "statusItem",
+    "pointer",
+    "windows"
+  ],
+  "window": {
+    "width": 106,
+    "height": 114,
+    "titlebar": "none",
+    "material": "transparent",
+    "level": "floating",
+    "showInDock": false,
+    "resizable": false
+  },
+  "entry": {
+    "html": "src/index.html",
+    "css": "src/style.css",
+    "script": [
+      "src/sprite.js",
+      "src/behaviour.js",
+      "src/main.js"
+    ]
+  },
+  "locales": {
+    "zh-CN": "locales/zh-CN.json",
+    "en-US": "locales/en-US.json",
+    "ja-JP": "locales/ja-JP.json",
+    "ar": "locales/ar.json",
+    "ko-KR": "locales/ko-KR.json"
+  },
+  "peers": [
+    "outside-weather"
+  ]
+}

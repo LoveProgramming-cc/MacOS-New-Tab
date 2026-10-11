@@ -1,0 +1,17 @@
+/* The window is only the picture: no surface, nothing around her. */
+html, body, #app-root { background: transparent; overflow: hidden; }
+.pet {
+  position: absolute; inset: 0;
+  cursor: grab; touch-action: none;
+  user-select: none; -webkit-user-select: none; -webkit-user-drag: none;
+}
+.pet.dragging { cursor: grabbing; }
+/* One cell of the 8 × 11 sprite sheet (192 × 208 each), scaled to the window. */
+.sprite {
+  position: absolute; inset: 0;
+  background-image: url("../assets/sprites.webp");
+  background-repeat: no-repeat;
+  background-size: 800% 1100%;
+  background-position: 0 0;
+  pointer-events: none;
+}

@@ -1,0 +1,462 @@
+/* Accessibility and developer display modes; widget dragging.
+   The stylesheets are loaded in the order of their numbers; later files refine earlier ones. */
+/* V49 — dedicated developer/accessibility behavior. */
+body.dev-disable-animations *,
+body.dev-disable-animations *::before,
+body.dev-disable-animations *::after {
+    animation-duration: .001ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: .001ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+}
+body.dev-reduce-transparency {
+    --acrylic-bg: rgba(246,246,248,.985);
+    --blur-heavy: none;
+}
+body.dark-mode.dev-reduce-transparency { --acrylic-bg: rgba(36,36,39,.99); }
+body.dev-reduce-transparency .mac-acrylic,
+body.dev-reduce-transparency .widget-card::before,
+body.dev-reduce-transparency .trash-finder-sidebar,
+body.dev-reduce-transparency #spotlight,
+body.dev-reduce-transparency .floating-context-submenu,
+body.dev-reduce-transparency .widget-context-menu,
+body.dev-reduce-transparency .mac-dialog-card {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background-color: var(--acrylic-bg) !important;
+}
+body.dev-increase-contrast {
+    --text-muted: rgba(30,30,32,.82);
+    --acrylic-border: 1px solid rgba(20,20,24,.42);
+    --mac-border: 1px solid rgba(20,20,24,.30);
+    --mac-border-light: 1px solid rgba(20,20,24,.30);
+}
+body.dark-mode.dev-increase-contrast {
+    --text-muted: rgba(245,245,247,.86);
+    --acrylic-border: 1px solid rgba(255,255,255,.46);
+    --mac-border: 1px solid rgba(255,255,255,.32);
+    --mac-border-light: 1px solid rgba(255,255,255,.32);
+}
+.developer-setting-note { margin-top:3px; max-width:440px; color:var(--text-muted); font-size:11px; line-height:1.35; }
+.developer-settings-panel { position: relative; }
+.developer-settings-panel .mac-card { margin-bottom:20px; }
+body.dev-incognito-config .developer-settings-panel::after {
+    content:'Incognito'; position:absolute; right:22px; top:14px; font-size:10px; font-weight:600;
+    padding:3px 8px; border-radius:999px; background:rgba(var(--accent-rgb),.15); color:var(--accent); pointer-events:none;
+}
+
+/* Keep the HTML5 drag source alive while visually hiding the picker. A full-screen
+   catcher above it becomes the actual drop target, including the picker's old rectangle. */
+body.widget-drag-to-desktop #widget-gallery { opacity: 0 !important; transition: opacity 70ms linear !important; }
+body.widget-drag-to-desktop #widget-gallery,
+body.widget-drag-to-desktop #widget-gallery * { pointer-events: auto !important; }
+#widget-desktop-drop-catcher { z-index: 1000250 !important; cursor: grabbing; }
+
+
+/* V49 gallery pointer drag: the dragged widget keeps its normal appearance while
+   the selection panel is hidden. */
+.widget-pointer-drag-host {
+    position: fixed; left: 0; top: 0; z-index: 1000260; pointer-events: none;
+    overflow: visible; filter: none; opacity: 1; will-change: left, top;
+}
+.widget-pointer-drag-host .widget-card { margin: 0 !important; opacity: 1 !important; filter: none !important; }
+
+/* V50 — resilient widget drag, richer accessibility surfaces and reusable controls */
+
+/* Pure pointer gallery drag: once motion starts the picker is visually gone and, more
+   importantly, cannot intercept pointer-up even inside its former rectangle. */
+body.widget-drag-to-desktop #widget-gallery,
+body.widget-drag-to-desktop #widget-gallery * {
+    pointer-events: none !important;
+}
+.widget-gallery-item { touch-action: none; user-select: none; -webkit-user-drag: none; }
+.widget-gallery-item img { -webkit-user-drag: none; user-select: none; }
+.widget-pointer-drag-host {
+    left: 0 !important;
+    top: 0 !important;
+    transform: translate3d(0,0,0);
+    will-change: transform;
+}
+
+/* Digital Clock — macOS-style square face with dense perimeter ticks. */
+.widget-clock:has(.digital-clock-face) { padding: 12px !important; }
+.digital-clock-face {
+    position: relative;
+    width: 136px;
+    height: 136px;
+    flex: 0 0 136px;
+    border-radius: 26px;
+    background: #fbfbfb;
+    border: 1px solid rgba(0,0,0,.10);
+    box-shadow: 0 5px 15px rgba(0,0,0,.12), inset 0 0 0 .5px rgba(255,255,255,.8);
+    color: #050505;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+}
+.digital-clock-ticks { position:absolute; inset:0; pointer-events:none; }
+.digital-clock-tick {
+    position:absolute;
+    left:50%;
+    top:50%;
+    width:2px;
+    height:9px;
+    margin-inline-start:-1px;
+    margin-top:-4.5px;
+    border-radius:2px;
+    background:#4b4b4d;
+    transform-origin:1px 4.5px;
+    transform: rotate(var(--clock-tick-angle)) translateY(-58px) rotate(calc(-1 * var(--clock-tick-angle)));
+    opacity:.82;
+}
+.digital-clock-face .widget-digital-time {
+    position:relative;
+    z-index:2;
+    font-family:'SFPro-Bold','PingFangSC-Semibold',system-ui,sans-serif;
+    font-size:47px;
+    font-weight:700;
+    line-height:1;
+    letter-spacing:-3px;
+    transform:translateX(-5px);
+    color:#050505;
+    font-variant-numeric:tabular-nums;
+}
+.digital-clock-side-label {
+    position:absolute;
+    right:10px;
+    top:50%;
+    transform:translateY(-50%);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:1px;
+    font-size:6px;
+    line-height:.95;
+    color:#777;
+    letter-spacing:.15px;
+}
+body.dark-mode .digital-clock-face {
+    /* The macOS Clock face remains a light card in dark mode. */
+    background:#f7f7f7;
+    color:#050505;
+    border-color:rgba(255,255,255,.18);
+}
+
+/* Internal settings search results, matching the sidebar search model rather than only
+   filtering top-level section names. */
+.settings-search-results {
+    margin: 7px 10px 10px;
+    max-height: 310px;
+    overflow:auto;
+    display:flex;
+    flex-direction:column;
+    gap:3px;
+}
+.settings-search-results.hidden { display:none !important; }
+.settings-search-result {
+    appearance:none;
+    border:0;
+    width:100%;
+    text-align: start;
+    border-radius:8px;
+    padding:7px 9px;
+    background:transparent;
+    color:var(--text-main);
+    cursor:default;
+    font:inherit;
+}
+.settings-search-result:hover,
+.settings-search-result:focus-visible { background:rgba(128,128,132,.18); outline:none; }
+.settings-search-result-title { display:block; font-size:12px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.settings-search-result-section { display:block; margin-top:1px; font-size:10px; color:var(--text-muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.settings-search-highlight { animation: settingsSearchPulse .85s ease-out; }
+@keyframes settingsSearchPulse { 0%,45% { box-shadow:0 0 0 3px rgba(var(--accent-rgb),.45); } 100% { box-shadow:none; } }
+
+/* Plugin manager uses the same system primitives as the rest of Settings. */
+.plugin-list { display:flex; flex-direction:column; gap:6px; min-height:0 !important; }
+.plugin-row {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    min-height:44px;
+    padding:7px 9px;
+    border-radius:var(--system-radius);
+    border:1px solid rgba(128,128,132,.18);
+    background:rgba(255,255,255,.18);
+}
+body.dark-mode .plugin-row { background:rgba(0,0,0,.10); }
+.plugin-row.active { border-color:rgba(var(--accent-rgb),.52); }
+.plugin-row-info { min-width:0; display:flex; flex-direction:column; gap:1px; }
+.plugin-row-info strong { font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.plugin-row-info span { font-size:10px; color:var(--text-muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.plugin-row-actions { flex:0 0 auto; display:flex; gap:5px; align-items:center; }
+.inline-number-pair { display:flex; align-items:center; gap:5px; }
+.compact-number { width:72px !important; }
+
+/* High Contrast follows macOS accessibility semantics: stronger opaque surfaces and
+   color separation, not merely extra outlines. It always implies reduced transparency. */
+body.dev-increase-contrast.light-mode {
+    --text-main:#000;
+    --text-muted:#3f3f43;
+    --acrylic-bg:#f5f5f5;
+    --window-bg:#f7f7f7;
+    --sidebar-bg:#dedede;
+    --mac-border:1px solid #797979;
+    --mac-border-light:1px solid #8b8b8b;
+    --acrylic-border:1px solid #6f6f6f;
+}
+body.dark-mode.dev-increase-contrast {
+    --text-main:#fff;
+    --text-muted:#c8c8cc;
+    --acrylic-bg:#202020;
+    --window-bg:#242424;
+    --sidebar-bg:#1b1b1b;
+    --mac-border:1px solid #8a8a8a;
+    --mac-border-light:1px solid #767676;
+    --acrylic-border:1px solid #969696;
+}
+body.dev-increase-contrast .window,
+body.dev-increase-contrast .settings-window,
+body.dev-increase-contrast .trash-finder-window,
+body.dev-increase-contrast .widget-gallery-shell,
+body.dev-increase-contrast .mac-dialog-card,
+body.dev-increase-contrast #spotlight,
+body.dev-increase-contrast .widget-context-menu,
+body.dev-increase-contrast .floating-context-submenu {
+    background:var(--window-bg) !important;
+    color:var(--text-main) !important;
+    border:var(--acrylic-border) !important;
+    box-shadow:0 12px 38px rgba(0,0,0,.35) !important;
+}
+body.dev-increase-contrast .settings-sidebar,
+body.dev-increase-contrast .trash-finder-sidebar,
+body.dev-increase-contrast .widget-gallery-sidebar {
+    background:var(--sidebar-bg) !important;
+    border-inline-end:1px solid rgba(80,80,84,.72) !important;
+}
+body.dark-mode.dev-increase-contrast .settings-sidebar,
+body.dark-mode.dev-increase-contrast .trash-finder-sidebar,
+body.dark-mode.dev-increase-contrast .widget-gallery-sidebar { border-inline-end-color:rgba(215,215,220,.55) !important; }
+body.dev-increase-contrast .mac-card,
+body.dev-increase-contrast .card-row,
+body.dev-increase-contrast .plugin-row,
+body.dev-increase-contrast .widget-card::before {
+    background:var(--window-bg) !important;
+    border-color:rgba(96,96,100,.66) !important;
+}
+body.dark-mode.dev-increase-contrast .mac-card,
+body.dark-mode.dev-increase-contrast .card-row,
+body.dark-mode.dev-increase-contrast .plugin-row,
+body.dark-mode.dev-increase-contrast .widget-card::before { border-color:rgba(196,196,200,.54) !important; }
+body.dev-increase-contrast .settings-nav-item.active,
+body.dev-increase-contrast .widget-gallery-category.active { background:var(--accent) !important; color:#fff !important; }
+body.dev-increase-contrast input,
+body.dev-increase-contrast .mac-input,
+body.dev-increase-contrast .mac-custom-select,
+body.dev-increase-contrast .mac-btn:not(.blue) {
+    background:var(--window-bg) !important;
+    color:var(--text-main) !important;
+    border:1px solid rgba(90,90,94,.72) !important;
+}
+body.dark-mode.dev-increase-contrast input,
+body.dark-mode.dev-increase-contrast .mac-input,
+body.dark-mode.dev-increase-contrast .mac-custom-select,
+body.dark-mode.dev-increase-contrast .mac-btn:not(.blue) { border-color:rgba(205,205,210,.55) !important; }
+
+/* A small visual distinction while the launchpad wheel is between pages. */
+#launchpad-grid.launchpad-wheel-dragging { scroll-behavior:auto !important; }
+.developer-layout-controls { display:flex; align-items:center; gap:6px; flex:0 0 auto; }
+.developer-layout-controls .mac-custom-select { min-width:74px; }
+.limit-overlay-settings input[type="color"] { width:46px; height:28px; padding:2px; border-radius:7px; }
+.ui-kit-window-header { min-height:44px; display:flex; align-items:center; gap:12px; padding:0 14px; border-bottom:1px solid rgba(128,128,132,.18); }
+.ui-kit-window-body { min-height:0; padding:14px; }
+
+
+/* The widget material is clipped by its own border radius. (A clip-path plus a forced
+   layer here made the compositor mask the blur separately, and that mask could come out
+   at another size than the card: corners with a transparent wedge.) */
+.widget-card::before {
+    z-index: 0 !important;
+    inset: -0.5px;
+}
+.widget-card > :not(.widget-remove) { z-index: 1; }
+.widget-card > .widget-remove { z-index: 100; }
+/* An opaque photo already covers the full widget, so its hidden glass layer is wasted.
+   Empty photo widgets intentionally retain acrylic blur. */
+.widget-photo.widget-photo-has-image::before {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: transparent !important;
+}
+.widget-preview::before,
+.widget-pointer-drag-card::before,
+.widget-drag-image::before,
+.desktop-widget-dragging::before {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+.widget-preview::before { background: rgba(235,235,238,.76) !important; }
+body.dark-mode .widget-preview::before { background: rgba(48,48,52,.82) !important; }
+.widget-preview-placeholder {
+    width:100%; height:100%; display:flex; align-items:center; justify-content:center;
+    font-size:16px; font-weight:600; opacity:.62; text-align:center; padding:12px; box-sizing:border-box;
+}
+.desktop-widget-dragging { will-change: transform; }
+.photo-widget-frame img { transition-duration: .26s; }
+.photo-import-progress-row { align-items:center; gap:14px; }
+.photo-import-progress-row progress {
+    width: 180px; height: 8px; appearance: none; -webkit-appearance: none;
+    border: 0; border-radius: 999px; overflow: hidden; background: rgba(128,128,128,.18);
+}
+.photo-import-progress-row progress::-webkit-progress-bar { background: rgba(128,128,128,.18); border-radius:999px; }
+.photo-import-progress-row progress::-webkit-progress-value { background: var(--accent); border-radius:999px; }
+
+.widget-quick-photo-progress { width:100%; height:7px; appearance:none; -webkit-appearance:none; border:0; border-radius:999px; overflow:hidden; background:rgba(128,128,128,.18); }
+.widget-quick-photo-progress::-webkit-progress-bar { background:rgba(128,128,128,.18); }
+.widget-quick-photo-progress::-webkit-progress-value { background:var(--accent); }
+
+
+/* V51.2 — widget correctness, drag fidelity, accessibility and performance modes. */
+/* The acrylic pseudo-layer is positioned; direct widget content must also be positioned
+   or Chromium may paint the glass above it. This was hiding weather/Screen Time text. */
+.widget-card > :not(.widget-remove) { position: relative; z-index: 1 !important; }
+.widget-card > .widget-remove { position: absolute; z-index: 100 !important; }
+
+/* The actual widget stays fully acrylic while moving. Only static Gallery thumbnails use
+   the cheap no-blur preview. */
+.widget-pointer-drag-card::before,
+.widget-drag-image::before,
+.desktop-widget-dragging::before,
+.widget-center-dragging::before {
+    backdrop-filter: var(--blur-heavy) !important;
+    -webkit-backdrop-filter: var(--blur-heavy) !important;
+    background: var(--acrylic-bg) !important;
+}
+.widget-photo.widget-photo-has-image.widget-pointer-drag-card::before,
+.widget-photo.widget-photo-has-image.widget-drag-image::before,
+.widget-photo.widget-photo-has-image.desktop-widget-dragging::before,
+.widget-photo.widget-photo-has-image.widget-center-dragging::before {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: transparent !important;
+}
+
+/* Reduced Transparency applies to the placement target too. */
+body.dev-reduce-transparency .widget-placement-ghost {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: var(--acrylic-bg) !important;
+    border-color: rgba(128,128,132,.72) !important;
+}
+
+/* Developer: transparency instead of blur. Keep alpha/color, drop only the expensive
+   background sampling. Reduced Transparency / Increase Contrast take precedence. */
+body.dev-transparent-glass .mac-acrylic,
+body.dev-transparent-glass .widget-card::before,
+body.dev-transparent-glass .widget-placement-ghost,
+body.dev-transparent-glass #spotlight,
+body.dev-transparent-glass .window,
+body.dev-transparent-glass .settings-sidebar,
+body.dev-transparent-glass .widget-gallery-shell,
+body.dev-transparent-glass .widget-context-menu,
+body.dev-transparent-glass .floating-context-submenu,
+body.dev-transparent-glass .mac-dialog-card {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* Keep widget charts/labels inside their own clip box; no negative label overflow. */
+.screen-time-hourly-chart:not(.manager) {
+    margin-bottom: 0 !important;
+    padding-bottom: 13px;
+    box-sizing: border-box;
+    overflow: hidden !important;
+}
+.screen-time-hourly-chart:not(.manager) .screen-time-hour-label { bottom: 0 !important; }
+.screen-time-content,
+.weather-widget-content { position: relative; z-index: 2 !important; }
+
+/* Launchpad rubber-band transform only while a gesture is active; scroll remains direct. */
+#launchpad-grid.launchpad-wheel-dragging .launchpad-page { transform:none !important;
+    will-change: transform;
+}
+
+body.dev-disable-extra-features #desktop-widget-layer,
+body.dev-disable-extra-features #widget-center,
+body.dev-disable-extra-features #widget-gallery { display: none !important; }
+body.dev-disable-extra-features .plugin-runtime-disabled { opacity: .55; }
+body.dev-disable-extra-features #set-screen-time .mac-card,
+body.dev-disable-extra-features .limit-overlay-settings { opacity: .58; }
+
+
+/* V52 — developer text selection and final interaction guarantees. */
+body.dev-selectable-ui,
+body.dev-selectable-ui * {
+    user-select: text !important;
+    -webkit-user-select: text !important;
+}
+body.dev-selectable-ui img,
+body.dev-selectable-ui svg,
+body.dev-selectable-ui canvas,
+body.dev-selectable-ui .slider,
+body.dev-selectable-ui .dock-resize-handle,
+body.dev-selectable-ui .window-controls,
+body.dev-selectable-ui .widget-placement-ghost,
+body.dev-selectable-ui .widget-remove {
+    user-select: none !important;
+    -webkit-user-select: none !important;
+}
+.desktop-widget-dragging,
+.widget-center-dragging,
+.widget-pointer-drag-card,
+.widget-drag-image { opacity: 1 !important; filter: none !important; }
+body.dev-reduce-transparency .widget-placement-ghost {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: var(--window-bg) !important;
+}
+body.dev-transparent-glass .widget-placement-ghost {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+/* In transparent-glass performance mode, every backdrop sampler is disabled globally;
+   existing translucent backgrounds remain, so the UI stays transparent rather than opaque. */
+body.dev-transparent-glass *,
+body.dev-transparent-glass *::before,
+body.dev-transparent-glass *::after {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+
+
+/* Developer Beta 0.55.0: danger context rows keep readable white text over the red hover fill. */
+.widget-context-item.danger:hover .widget-context-label,
+.widget-context-item.danger:active .widget-context-label,
+.widget-context-item.danger.selected .widget-context-label,
+.widget-context-item.danger:focus-visible .widget-context-label { color:#fff !important; }
+
+/* Developer Beta 0.55.0: descriptive setting copy owns the flexible column; controls never get squeezed. */
+.card-row > div:first-child { min-width:0; flex:1 1 auto; padding-inline-end:16px; }
+.card-row > .mac-switch { flex:0 0 36px; margin-inline-start:16px; }
+.card-row > .mac-btn,
+.card-row > .mac-custom-select,
+.card-row > .widget-glass-select,
+.card-row > select,
+.card-row > input:not([type="checkbox"]) { flex:0 0 auto; margin-inline-start:14px; max-width:48%; }
+.developer-setting-note { max-width:none !important; overflow-wrap:anywhere; word-break:normal; }
+@media (max-width:560px) {
+    .card-row > div:first-child { padding-inline-end:10px; }
+    .card-row > .mac-switch { margin-inline-start:10px; }
+}
+
+/* Trash drop target: keep Dock geometry completely stable during drag.
+   macOS does not need a large floating “Move to Trash” panel here; a subtle halo is
+   enough feedback and avoids changing the icon/Dock hit box mid-gesture. */
+.dock-trash-item.trash-drop-ready .dock-icon {
+    transform:none !important;
+    filter:drop-shadow(0 0 8px rgba(58,145,255,.55)) brightness(1.08);
+}
+.dock-trash-item.trash-drop-ready::after { content:none !important; display:none !important; }

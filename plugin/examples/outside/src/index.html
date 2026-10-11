@@ -1,0 +1,53 @@
+<div id="shade" class="shade" aria-hidden="true"></div>
+<canvas id="sky" class="sky" aria-hidden="true"></canvas>
+<section id="panel" class="panel" hidden>
+  <header class="head">
+    <div id="now-emoji" class="now-emoji">☀️</div>
+    <div class="head-text">
+      <div class="app-name" data-t="appName">Outside</div>
+      <div id="now-line" class="now-line"></div>
+    </div>
+    <button id="close" class="icon-btn" type="button">×</button>
+  </header>
+
+  <div id="mode" class="seg" role="tablist">
+    <button type="button" data-mode="live" data-t="modeLive">Live Weather</button>
+    <button type="button" data-mode="manual" data-t="modeManual">Pick My Own</button>
+  </div>
+
+  <div id="live" class="live">
+    <div class="city-row">
+      <input id="city" class="field" type="search" autocomplete="off" spellcheck="false">
+      <button id="search" class="btn" type="button" data-t="search">Search</button>
+    </div>
+    <div id="results" class="results"></div>
+    <div class="live-foot">
+      <span id="updated" class="muted"></span>
+      <button id="refresh" class="link" type="button" data-t="refresh">Refresh</button>
+    </div>
+  </div>
+
+  <div id="manual" class="scenes"></div>
+
+  <div class="rows">
+    <div class="row slider-row">
+      <span data-t="intensity">Intensity</span>
+      <input id="intensity" type="range" min="0.2" max="2" step="0.05">
+    </div>
+    <div class="row slider-row">
+      <span data-t="wind">Wind</span>
+      <input id="wind" type="range" min="-1" max="1" step="0.05">
+    </div>
+    <label class="row toggle"><span data-t="optPile">Snow settles on the Dock</span><input id="opt-pile" type="checkbox"><i></i></label>
+    <label class="row toggle"><span data-t="optPointer">Pointer is an umbrella</span><input id="opt-pointer" type="checkbox"><i></i></label>
+    <label class="row toggle"><span data-t="optFlashes">Lightning flashes</span><input id="opt-flashes" type="checkbox"><i></i></label>
+    <label class="row toggle"><span data-t="optTint">Darken the sky</span><input id="opt-tint" type="checkbox"><i></i></label>
+    <label class="row toggle"><span data-t="optNoHaze">No fog or clouds</span><input id="opt-haze" type="checkbox"><i></i></label>
+    <label class="row toggle"><span data-t="optEco">Low power</span><input id="opt-eco" type="checkbox"><i></i></label>
+  </div>
+
+  <footer class="foot">
+    <button id="pause" class="btn" type="button"></button>
+    <button id="credit" class="link" type="button">Open-Meteo</button>
+  </footer>
+</section>

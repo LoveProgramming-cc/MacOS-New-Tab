@@ -1,0 +1,306 @@
+/* Status items, Notification Center, tiling, Mission Control, Spotlight results, right-to-left, application widgets, frosted bars.
+   The stylesheets are loaded in the order of their numbers; later files refine earlier ones. */
+/* ------------------------------------------------------------------------------
+   System Settings: sidebar groups
+   ------------------------------------------------------------------------------ */
+.settings-sidebar .tab.tab-group-start { margin-top: 12px; }
+.application-plugin-usage { margin-top: 2px; font-size: 11px; color: var(--text-muted); }
+.application-plugin-usage > summary { cursor: default; width: fit-content; }
+.application-plugin-usage > summary:hover { color: var(--text-main); }
+.permission-usage-list { display: flex; flex-direction: column; gap: 3px; margin: 6px 0 2px; font-size: 11px; color: var(--text-muted); }
+.permission-usage-row { display: flex; gap: 10px; align-items: center; min-height: 22px; }
+.permission-usage-row > .mac-switch { flex: 0 0 auto; margin-inline-start: auto; transform: scale(.82); transform-origin: center; }
+.permission-usage-row.denied .permission-usage-name { text-decoration: line-through; color: var(--text-muted); }
+.permission-usage-name { flex: 0 0 auto; min-width: 84px; color: var(--text-main); }
+.permission-usage-row.unused .permission-usage-name { color: var(--text-muted); }
+.permission-usage-detail { min-width: 0; overflow-wrap: anywhere; }
+.developer-instance-row > .mac-custom-select { flex: 0 0 auto; }
+
+/* ------------------------------------------------------------------------------
+   Menu bar status items (macos.statusItem)
+   ------------------------------------------------------------------------------ */
+.menu-right { display: flex; align-items: center; height: 100%; }
+.menu-right .status-items { display: flex; align-items: center; gap: 2px; height: 100%; margin-inline-end: 10px; }
+.menu-right .status-items:empty { display: none; }
+.menu-right .status-item { display: inline-flex; align-items: center; gap: 5px; height: 20px; padding: 0 7px; margin: 0; border-radius: 5px; cursor: default; white-space: nowrap; }
+.menu-right .status-item:hover, .menu-right .status-item.active { background: rgba(128,128,132,.28); }
+.menu-right .status-item span { margin: 0; }
+.status-item-icon { width: 15px; height: 15px; flex: 0 0 15px; background: center / contain no-repeat; }
+.status-item-icon.template { background: currentColor; -webkit-mask: center / contain no-repeat; mask: center / contain no-repeat; }
+.status-panel { position: fixed; z-index: 950000; min-width: 220px; max-width: min(420px, calc(100vw - 16px)); border-radius: 16px; color: var(--text-color, inherit); }
+.status-panel.hidden { display: none; }
+.status-panel-frame { padding: 12px; border-radius: inherit; display: flex; overflow: hidden; --native-border: rgba(60,60,67,.18); }
+.status-panel-frame.plugin-native-app-frame-flush { padding: 0; }
+.status-panel-frame > * { flex: 1 1 auto; min-width: 0; }
+body.dark-mode .status-panel-frame { --native-secondary: rgba(245,245,247,.62); --native-border: rgba(255,255,255,.15); --native-control: rgba(116,116,122,.48); --native-control-hover: rgba(132,132,138,.58); }
+.status-item-title { max-width: 180px; overflow: hidden; text-overflow: ellipsis; }
+
+/* ------------------------------------------------------------------------------
+   Notification Center (above the widgets) and banners
+   ------------------------------------------------------------------------------ */
+#clock.has-notifications::after { content: ''; display: inline-block; width: 6px; height: 6px; margin-inline-start: 6px; border-radius: 50%; background: var(--accent); vertical-align: 1px; }
+.notification-center { flex: 0 0 auto; display: flex; flex-direction: column; align-items: flex-end; max-height: 46%; min-height: 0; padding: 0 12px 10px; }
+.notification-center[hidden] { display: none; }
+.notification-center-head { display: flex; align-items: center; justify-content: space-between; width: 332px; max-width: 100%; padding: 2px 4px 6px; box-sizing: border-box; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.45); font-size: 13px; font-weight: 600; }
+.notification-center-clear { appearance: none; border: 0; border-radius: 10px; padding: 3px 9px; font: inherit; font-size: 11px; font-weight: 500; color: inherit; background: rgba(80,80,86,.5); cursor: default; }
+.notification-center-clear:hover { background: rgba(80,80,86,.75); }
+/* The list scrolls, so it clips; the room for the close buttons that hang over each card's corner is part of the list itself. */
+.notification-center-list { display: flex; flex-direction: column; gap: 8px; width: 340px; max-width: calc(100% + 8px); box-sizing: border-box; padding-block-start: 8px; padding-inline-start: 8px; margin-block-start: -8px; margin-inline-start: -8px; overflow-y: auto; min-height: 0; scrollbar-width: none; }
+.notification-center-list::-webkit-scrollbar { display: none; }
+.app-notification { position: relative; }
+/* In the list a card casts a short shadow: a window-sized one would be cut off by the scrolling list. */
+.app-notification.in-center { animation: none; flex: 0 0 auto; box-shadow: 0 1px 6px rgba(0,0,0,.14) !important; }
+.app-notification-body { flex: 1 1 auto; }
+.app-notification-head { display: flex; justify-content: space-between; gap: 8px; }
+.app-notification-time { font-size: 11px; color: var(--text-muted); flex: 0 0 auto; }
+.app-notification-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 7px; }
+.app-notification-action { appearance: none; flex: 1 1 0; min-width: 0; height: 24px; padding: 0 10px; border: 0; border-radius: 7px; font: inherit; font-size: 12px; font-weight: 500; color: var(--text-main); background: rgba(128,128,134,.22); cursor: default; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.app-notification-action:hover { background: rgba(128,128,134,.34); }
+.app-notification-action:active { background: rgba(128,128,134,.46); }
+.app-notification-action.destructive { color: #ff3b30; }
+.app-notification-action:focus-visible { outline: 2px solid rgba(var(--accent-rgb),.7); outline-offset: 1px; }
+.app-notification-close { position: absolute; top: -6px; left: -6px; width: 18px; height: 18px; padding: 0; border: 0; border-radius: 50%; background: rgba(110,110,116,.92); color: #fff; font-size: 13px; line-height: 18px; cursor: default; opacity: 0; transition: opacity .12s ease; }
+.app-notification:hover .app-notification-close { opacity: 1; }
+
+/* ------------------------------------------------------------------------------
+   Window tiling and Mission Control
+   ------------------------------------------------------------------------------ */
+.window-snap-preview { position: fixed; border-radius: 12px; pointer-events: none; background: rgba(255,255,255,.22); border: 1.5px solid rgba(255,255,255,.6); box-shadow: 0 8px 30px rgba(0,0,0,.18); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    transition: left .18s cubic-bezier(.25,.8,.25,1), top .18s cubic-bezier(.25,.8,.25,1), width .18s cubic-bezier(.25,.8,.25,1), height .18s cubic-bezier(.25,.8,.25,1); }
+.mission-control-backdrop { position: fixed; inset: 0; z-index: 4990; background: rgba(0,0,0,.34); backdrop-filter: blur(14px) saturate(120%); -webkit-backdrop-filter: blur(14px) saturate(120%); animation: mission-control-in .28s ease both; }
+.mission-control-backdrop.leaving { opacity: 0; transition: opacity .3s ease; pointer-events: none; }
+@keyframes mission-control-in { from { opacity: 0; } to { opacity: 1; } }
+.mission-control-window { transition: translate .32s cubic-bezier(.25,.8,.25,1), scale .32s cubic-bezier(.25,.8,.25,1) !important; }
+.mission-control-shield { position: absolute; inset: 0; z-index: 2147483000; border-radius: inherit; cursor: default; }
+.mission-control-shield:hover { box-shadow: inset 0 0 0 6px rgba(var(--accent-rgb), .9); }
+.mission-control-label { position: fixed; z-index: 800001; transform: translateX(-50%); max-width: 260px; padding: 2px 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 500; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.6); pointer-events: none; animation: mission-control-in .3s ease .12s both; }
+body.mission-control-open #spotlight, body.mission-control-open #desktop-grid, body.mission-control-open #desktop-widget-layer { pointer-events: none; }
+body.mission-control-open #spotlight { opacity: 0; }
+body.mission-control-open .window, body.mission-control-open .plugin-app-window { resize: none !important; }
+body.dev-reduce-transparency .window-snap-preview { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(150,150,156,.5); }
+body.dev-transparent-glass .window-snap-preview, body.dev-transparent-glass .mission-control-backdrop { backdrop-filter: none; -webkit-backdrop-filter: none; }
+body.dev-reduce-transparency .mission-control-backdrop { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(0,0,0,.6); }
+
+/* ------------------------------------------------------------------------------
+   Spotlight results
+   ------------------------------------------------------------------------------ */
+/* Spotlight glass sits on a surface of its own, like widgets and application windows: the
+   box that holds the field and the results is then never the box whose backdrop is sampled,
+   so content stacking inside the pane cannot make Chromium draw one pane's blur in pieces. */
+#spotlight.mac-acrylic { isolation: isolate; background-color: transparent !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; -webkit-backface-visibility: visible; backface-visibility: visible; }
+#spotlight::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none; background: var(--acrylic-bg); -webkit-backdrop-filter: blur(42px) saturate(178%); backdrop-filter: blur(42px) saturate(178%); }
+body.dev-reduce-transparency #spotlight::before, body.dev-increase-contrast #spotlight::before { -webkit-backdrop-filter: none; backdrop-filter: none; }
+body.dev-increase-contrast #spotlight::before { background: var(--window-bg); }
+#spotlight.spotlight-searching #quick-links { display: none; }
+.spotlight-results { position: relative; z-index: 15; display: flex; flex-direction: column; gap: 1px; padding: 8px; overflow-y: auto; min-height: 0; flex: 1 1 auto; pointer-events: auto; }
+.spotlight-results.hidden { display: none; }
+.spotlight-section { padding: 8px 10px 3px; font-size: 11px; font-weight: 600; color: var(--text-muted); }
+.spotlight-result { display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-radius: 8px; cursor: default; color: var(--text-main); flex: 0 0 auto; }
+.spotlight-result.selected { background: var(--accent); color: #fff; }
+.spotlight-result-icon { width: 28px; height: 28px; flex: 0 0 28px; display: grid; place-items: center; }
+.spotlight-result-icon img { width: 100%; height: 100%; object-fit: contain; border-radius: 6px; }
+.spotlight-app-icon { width: 28px; height: 28px; display: block; }
+.spotlight-result-glyph { font-size: 20px; line-height: 1; opacity: .8; }
+.spotlight-result-text { min-width: 0; flex: 1 1 auto; display: flex; flex-direction: column; }
+.spotlight-result-title { font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.spotlight-result-subtitle { font-size: 11px; opacity: .65; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.spotlight-result-kind { flex: 0 0 auto; font-size: 11px; opacity: .6; }
+
+/* ------------------------------------------------------------------------------
+   Developer Tools: permission use, replay
+   ------------------------------------------------------------------------------ */
+.devtools-usage { display: flex; flex-wrap: wrap; align-items: center; gap: 5px 6px; margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(128,128,128,.12); }
+.devtools-usage:empty { display: none; }
+.devtools-usage > .developer-setting-note { margin-block: 0 0; margin-inline: 0 4px; }
+.devtools-usage-chip { padding: 1px 7px; border-radius: 9px; font-size: 11px; background: rgba(52,199,89,.2); }
+.devtools-usage-chip.unused { background: rgba(128,128,132,.16); color: var(--text-muted); }
+.devtools-usage-chip.denied { outline: 1px solid rgba(255,69,58,.7); }
+.devtools-log-row.kind-perf .devtools-log-kind { color: #b25000; font-weight: 600; }
+.devtools-replay-row { cursor: default; }
+.devtools-replay-row.played { background: rgba(52,199,89,.16); }
+
+/* ------------------------------------------------------------------------------
+   Right-to-left layout (Arabic, Hebrew, …, or Developer ▸ Force right-to-left layout).
+   The document carries dir="rtl"; flex and grid rows, logical margins / paddings / radii
+   and text alignment mirror by themselves. What follows is what does not.
+   ------------------------------------------------------------------------------ */
+/* Windows are placed and resized in physical pixels (left / top, the resize grip at the
+   bottom right): the window box itself stays left-to-right and its content is mirrored. */
+[dir="rtl"] .window, [dir="rtl"] .plugin-app-window { direction: ltr; }
+[dir="rtl"] .window > *, [dir="rtl"] .plugin-app-window > * { direction: rtl; }
+[dir="rtl"] #settings-window, [dir="rtl"] .trash-finder-window, [dir="rtl"] .devtools-window { flex-direction: row-reverse !important; }
+[dir="rtl"] .plugin-app-titlebar { flex-direction: row; }
+/* Launchpad pages are scrolled by position; the pages keep their order and each page is mirrored. */
+[dir="rtl"] #launchpad-grid { direction: ltr; }
+[dir="rtl"] #launchpad-grid > * { direction: rtl; }
+/* Menus and panels that hang from the menu bar's ends. */
+[dir="rtl"] #apple-dropdown { left: auto; right: 10px; }
+[dir="rtl"] .widget-center { right: auto !important; left: 10px !important; }
+[dir="rtl"] .app-notification-stack { right: auto; left: 12px; }
+[dir="rtl"] .app-notification.leaving { transform: translateX(-24px); }
+[dir="rtl"] .app-notification-close { left: auto; right: -6px; }
+[dir="rtl"] .plugin-app-window.plugin-app-titlebar-hidden .plugin-app-titlebar { left: auto; right: 0; }
+/* The clock reads in its own language's direction, whichever way the layout runs. */
+#clock { unicode-bidi: plaintext; }
+/* A native node marked `ltr` keeps its order: playback controls, keypads, timelines. */
+.plugin-native-ltr { direction: ltr; }
+/* Glyphs that point along the reading direction. */
+[dir="rtl"] .finder-nav svg, [dir="rtl"] #bing-month-prev, [dir="rtl"] #bing-month-next { transform: scaleX(-1); }
+
+/* Subtitles: drawn by the host over the picture (plugin-system.js). Their size follows
+   the picture's height; size, backing and position are the user's (Accessibility ▸ Subtitles). */
+.plugin-native-video { container-type: size; }
+.plugin-subtitle-overlay { position: absolute; inset-inline: 0; bottom: 15%; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: .12em; padding-inline: 6%; box-sizing: border-box;
+    pointer-events: none; text-align: center; color: #fff; font: 500 clamp(12px, calc(4.6cqh * var(--subtitle-scale, 1)), 72px)/1.3 -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", sans-serif; }
+:root[data-subtitle-position="top"] .plugin-subtitle-overlay { bottom: auto; top: 7%; }
+/* Dragged to a place of the user's own: centred on that point of the picture. */
+:root[data-subtitle-position="custom"] .plugin-subtitle-overlay { inset: auto; left: var(--subtitle-x, 50%); top: var(--subtitle-y, 80%); width: max-content; max-width: 92%; padding-inline: 0; transform: translate(-50%, -50%); }
+.plugin-subtitle-line { pointer-events: auto; cursor: grab; }
+.plugin-subtitle-overlay.dragging .plugin-subtitle-line { cursor: grabbing; }
+.plugin-subtitle-overlay.dragging { outline: 1px dashed rgba(255,255,255,.7); outline-offset: 4px; border-radius: 6px; }
+.plugin-subtitle-line { max-width: 100%; padding: .08em .45em; border-radius: .22em; background: rgba(0,0,0,.55); unicode-bidi: plaintext; overflow-wrap: anywhere; }
+:root[data-subtitle-background="opaque"] .plugin-subtitle-line { background: #000; }
+:root[data-subtitle-background="none"] .plugin-subtitle-line { background: transparent; text-shadow: 0 0 .12em #000, 0 0 .22em #000, 0 .05em .2em #000, 0 0 .4em rgba(0,0,0,.8); }
+.plugin-media-park .plugin-subtitle-overlay { display: none; }
+/* An application's row: what can be done with its data sits on a line of its own. */
+.storage-row:has(> .storage-row-actions) { flex-wrap: wrap; row-gap: 8px; }
+.storage-row-actions { flex: 1 0 100%; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
+
+/* ------------------------------------------------------------------------------
+   Application widgets: a native UI tree the application published, drawn by the host
+   inside an ordinary widget card.
+   ------------------------------------------------------------------------------ */
+.widget-card.widget-app { padding: 0; cursor: default; }
+.widget-card.widget-app > .app-widget-frame { position: absolute; inset: 0; width: auto; height: auto; z-index: 0; }
+.app-widget-frame { overflow: hidden; padding: 14px; border-radius: inherit; display: flex; color: inherit; --native-border: rgba(60,60,67,.18); }
+.app-widget-frame.plugin-native-app-frame-flush { padding: 0; }
+.app-widget-frame > * { flex: 1 1 auto; min-width: 0; min-height: 0; }
+body.dark-mode .app-widget-frame { --native-secondary: rgba(245,245,247,.62); --native-border: rgba(255,255,255,.15); --native-control: rgba(116,116,122,.48); --native-control-hover: rgba(132,132,138,.58); }
+.app-widget-frame .plugin-native-button { cursor: pointer; }
+.widget-preview .app-widget-frame, .widget-editing .app-widget-frame { pointer-events: none; }
+.app-widget-placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; text-align: center; padding: 4px; }
+.app-widget-placeholder img { width: 44px; height: 44px; object-fit: contain; }
+.app-widget-placeholder-title { font-size: 13px; font-weight: 600; }
+.app-widget-placeholder-hint { font-size: 11px; color: var(--text-muted); line-height: 1.3; }
+
+/* Settings ▸ Applications: an application's permissions are folded away until asked for. */
+.permission-disclosure { appearance: none; border: 0; background: transparent; padding: 2px 0; margin-top: 4px; display: inline-flex; align-items: center; gap: 5px; font: inherit; font-size: 11px; color: var(--text-muted); cursor: default; }
+.permission-disclosure:hover { color: var(--text-main); }
+.permission-disclosure-chevron { display: inline-block; font-size: 13px; line-height: 1; transition: transform .16s ease; }
+.permission-disclosure[aria-expanded="true"] .permission-disclosure-chevron { transform: rotate(90deg); }
+[dir="rtl"] .permission-disclosure-chevron { transform: scaleX(-1); }
+[dir="rtl"] .permission-disclosure[aria-expanded="true"] .permission-disclosure-chevron { transform: rotate(90deg); }
+
+/* material: "bar" — a frosted bar that floats over the content of its own window (a page
+   title over the page that scrolls under it). It blurs that content, not the desktop. */
+.plugin-native-app-frame .plugin-native-material-bar { background: color-mix(in srgb, var(--solid-bg) 72%, transparent); -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%); border-bottom: 1px solid var(--native-hairline); z-index: 2; }
+body.dev-reduce-transparency .plugin-native-app-frame .plugin-native-material-bar,
+body.dev-transparent-glass .plugin-native-app-frame .plugin-native-material-bar { background: var(--solid-bg); -webkit-backdrop-filter: none; backdrop-filter: none; }
+
+/* Finder: the toolbar is a frosted bar over the files, which scroll underneath it. */
+.trash-finder-main { position: relative; }
+.trash-finder-toolbar { position: absolute; top: 0; inset-inline: 0; z-index: 5; background: color-mix(in srgb, var(--solid-bg) 72%, transparent); -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%); }
+body.dev-reduce-transparency .trash-finder-toolbar, body.dev-transparent-glass .trash-finder-toolbar { background: var(--solid-bg); -webkit-backdrop-filter: none; backdrop-filter: none; }
+.trash-finder-grid { padding-top: 70px !important; scroll-padding-top: 60px; }
+.trash-finder-grid.list-view { padding: 52px 0 0 !important; }
+.trash-finder-grid.list-view .finder-list-header { top: 52px; }
+
+/* ------------------------------------------------------------------------------
+   Outlines, sectioned lists, insertion line
+   ------------------------------------------------------------------------------ */
+.plugin-native-list-disclosure.spacer { visibility: hidden; }
+.plugin-native-list-disclosure.spacer::before { content: "›"; }
+[dir="rtl"] .plugin-native-list-disclosure { transform: scaleX(-1); }
+[dir="rtl"] .plugin-native-list-disclosure.open { transform: scaleX(-1) rotate(90deg); }
+.plugin-native-list-header { gap: 6px; }
+.plugin-native-list-header.collapsible { cursor: default; }
+.plugin-native-list-header.collapsible:hover { color: var(--native-text, var(--text-main)); }
+.plugin-native-list-header .plugin-native-list-disclosure { align-self: flex-end; width: 10px; flex: 0 0 10px !important; height: 14px; margin: 0 !important; font-size: 12px; }
+.plugin-native-list-header-title { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.plugin-native-list-header-detail { flex: 0 0 auto; font-weight: 500; opacity: .8; }
+.plugin-native-list-header.drop-hover { color: var(--native-accent); box-shadow: inset 0 0 0 2px var(--native-accent); border-radius: 7px; }
+/* The pinned copy of the current section's title: a frosted strip over the rows under it. */
+.plugin-native-list-pin { position: sticky; top: 0; height: 0; z-index: 2; overflow: visible; }
+.plugin-native-list-pin:empty { display: none; }
+.plugin-native-list-header.pinned { top: 0; background: color-mix(in srgb, var(--solid-bg) 72%, transparent); -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%); border-bottom: 1px solid var(--native-hairline, var(--native-border)); }
+body.dev-reduce-transparency .plugin-native-list-header.pinned, body.dev-transparent-glass .plugin-native-list-header.pinned { background: var(--solid-bg); -webkit-backdrop-filter: none; backdrop-filter: none; }
+.plugin-native-drop-marker { right: auto; inset-inline-end: 6px; }
+.plugin-native-drop-marker::before { content: ""; position: absolute; inset-inline-start: -3px; top: -2px; width: 6px; height: 6px; box-sizing: border-box; border-radius: 50%; border: 2px solid var(--native-accent); background: var(--solid-bg); }
+
+/* ------------------------------------------------------------------------------
+   Glass stays on the screen
+   A surface that samples its backdrop (backdrop-filter) must never extend past the edge
+   of the page: Chromium reads that backdrop from the page's own image, and a surface that
+   reaches outside it samples outside it — the seams and wrong patches inside one pane of
+   glass. So: no glass element is forced onto a layer of its own together with its shadow,
+   glass sits on its own inner surface where the element also has a shadow, and glass is cut
+   back to the screen edge (window-manager.js syncGlassToScreen) when a window hangs off it.
+   ------------------------------------------------------------------------------ */
+.window.mac-acrylic, #spotlight.mac-acrylic, .widget-gallery-shell.mac-acrylic, .widget-context-menu.mac-acrylic,
+.floating-context-submenu.mac-acrylic, .trash-finder-sidebar.mac-acrylic, .mac-dialog-card.mac-acrylic, .plugin-app-window {
+    -webkit-backface-visibility: visible !important; backface-visibility: visible !important;
+}
+/* The Dock: its shadow reaches below the screen, so the glass is an inner surface. */
+#dock-plate.mac-acrylic { isolation: isolate; background-color: transparent !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+#dock-plate::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none; background: var(--acrylic-bg); -webkit-backdrop-filter: var(--blur-heavy); backdrop-filter: var(--blur-heavy); }
+body.dev-reduce-transparency #dock-plate::before, body.dev-transparent-glass #dock-plate::before { -webkit-backdrop-filter: none; backdrop-filter: none; }
+body.dev-increase-contrast #dock-plate::before { background: var(--window-bg); -webkit-backdrop-filter: none; backdrop-filter: none; }
+/* A window partly off the screen: its glass ends at the screen edge. */
+.plugin-app-window::before, #spotlight::before {
+    inset: var(--glass-trim-top, 0px) var(--glass-trim-right, 0px) var(--glass-trim-bottom, 0px) var(--glass-trim-left, 0px);
+}
+/* Glass inside such a window that crosses the edge is clipped there (window-manager.js sets clip-path). */
+/* Launchpad: the blurred backdrop never grows past the screen; only its icons zoom. */
+#launchpad, #launchpad.active { transform: none !important; }
+#launchpad #launchpad-grid { transform: scale(1.05); transition: transform .3s cubic-bezier(.2,.8,.2,1); }
+#launchpad.active #launchpad-grid { transform: none; }
+body.dev-disable-animations #launchpad #launchpad-grid { transition: none; }
+/* Widgets: the glass is exactly the card; a widget laid out beyond the screen has none. */
+.widget-card::before { inset: 0; }
+.widget-card.widget-offscreen::before { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+/* Notification banners slide in from 10 px, inside their 12 px margin. */
+.app-notification.leaving { transform: translateX(10px); }
+[dir="rtl"] .app-notification.leaving { transform: translateX(-10px); }
+@keyframes app-notification-in { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: none; } }
+@keyframes app-notification-in-rtl { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: none; } }
+[dir="rtl"] .app-notification:not(.in-center) { animation-name: app-notification-in-rtl; }
+/* Widgets cast the small, soft shadow of macOS widgets, not a window's: it stays inside the
+   20 px margin of the widget grid instead of spreading 130 px past the edge of the screen. */
+.widget-card { box-shadow: 0 3px 14px rgba(0,0,0,.16), 0 0 0 .5px rgba(0,0,0,.06) !important; }
+body.dark-mode .widget-card { box-shadow: 0 3px 14px rgba(0,0,0,.32), 0 0 0 .5px rgba(255,255,255,.08) !important; }
+
+/* ------------------------------------------------------------------------------
+   Whole frames only
+   Chromium redraws just the part of the page that changed: one rectangle around every
+   change in the frame. It widens that rectangle to a whole pane of glass when a change
+   below the pane reaches it — but changes painted after the pane (the Dock, a desktop pet,
+   a menu) are added later and the pane is not looked at again. With two changes far apart
+   (a widget ticking on the left, the pet moving on the right) the rectangle around both
+   can then cut through a pane: the part inside is blurred again, from pixels next to it
+   that already are glass, and a line appears along the rectangle's edge — which is the
+   edge of the widget, i.e. a line of the widget grid.
+   This layer is the last thing painted and covers the screen. Its backdrop filter moves
+   no pixel that can be seen, but it counts as one that does, so any change makes Chromium
+   treat the whole screen as changed and no pane is ever redrawn in part. Without glass
+   (Reduce Transparency, transparency instead of frosted glass) it is not needed.
+   ------------------------------------------------------------------------------ */
+body::after {
+    content: ""; position: fixed; inset: 0; z-index: 2147483647; pointer-events: none;
+    -webkit-backdrop-filter: drop-shadow(0 0 0 rgba(0,0,0,0)); backdrop-filter: drop-shadow(0 0 0 rgba(0,0,0,0));
+}
+body.dev-reduce-transparency::after, body.dev-transparent-glass::after, body.dev-increase-contrast::after { display: none; }
+
+/* ------------------------------------------------------------------------------
+   Scroll bars of areas under a floating bar
+   The system's overlay scroll bar runs the whole height of the scroll area — up under a
+   header bar that floats over it, down under a player bar — and cannot be told otherwise.
+   A list or scroll area with insetTop / insetBottom therefore draws its own slim one
+   between the two bars (--scroll-track-top / -bottom), shown while scrolling or pointed at.
+   ------------------------------------------------------------------------------ */
+.plugin-native-inset-scroll::-webkit-scrollbar { width: 11px; height: 11px; background: transparent; }
+.plugin-native-inset-scroll::-webkit-scrollbar-track { background: transparent; margin-top: var(--scroll-track-top, 0px); margin-bottom: var(--scroll-track-bottom, 0px); }
+.plugin-native-inset-scroll::-webkit-scrollbar-thumb { min-height: 32px; border: 3px solid transparent; border-radius: 8px; background: transparent padding-box; }
+.plugin-native-inset-scroll.scrolling::-webkit-scrollbar-thumb, .plugin-native-inset-scroll::-webkit-scrollbar-thumb:hover { background-color: rgba(128,128,132,.55); }
+.plugin-native-inset-scroll::-webkit-scrollbar-thumb:active { background-color: rgba(128,128,132,.75); }
+.plugin-native-inset-scroll::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
+.plugin-native-inset-scroll::-webkit-scrollbar-corner { background: transparent; }

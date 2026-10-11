@@ -1,0 +1,155 @@
+{
+  "id": "outside-weather",
+  "name": "窗外",
+  "version": "1.5.0",
+  "kind": "app",
+  "runtime": "web",
+  "description": "The weather, on your desktop: rain splashes on your windows, snow settles on them and on the Dock, petals drift past. Live weather from Open-Meteo, or pick your own.",
+  "icon": "assets/icon.png",
+  "accentColor": "blue",
+  "settings": true,
+  "permissions": [
+    "storage",
+    "network",
+    "statusItem",
+    "pointer",
+    "windows",
+    "widgets",
+    "openExternal"
+  ],
+  "window": {
+    "width": 1280,
+    "height": 760,
+    "titlebar": "none",
+    "material": "transparent",
+    "level": "desktop",
+    "resizable": false,
+    "showInDock": false
+  },
+  "entry": {
+    "html": "src/index.html",
+    "css": "src/style.css",
+    "script": [
+      "src/weather.js",
+      "src/sky.js",
+      "src/main.js"
+    ]
+  },
+  "locales": {
+    "zh-CN": "locales/zh-CN.json",
+    "en-US": "locales/en-US.json",
+    "ko-KR": "locales/ko-KR.json",
+    "ja-JP": "locales/ja-JP.json"
+  },
+  "menus": [
+    {
+      "title": "Weather",
+      "titleKey": "menuWeather",
+      "items": [
+        {
+          "label": "Live Weather",
+          "labelKey": "modeLive",
+          "command": "live",
+          "shortcut": "⌥⌘L"
+        },
+        {
+          "separator": true
+        },
+        {
+          "label": "☀️  Clear",
+          "labelKey": "menu_clear",
+          "command": "scene:clear"
+        },
+        {
+          "label": "⛅  Cloudy",
+          "labelKey": "menu_cloudy",
+          "command": "scene:cloudy"
+        },
+        {
+          "label": "🌦️  Drizzle",
+          "labelKey": "menu_drizzle",
+          "command": "scene:drizzle"
+        },
+        {
+          "label": "🌧️  Rain",
+          "labelKey": "menu_rain",
+          "command": "scene:rain"
+        },
+        {
+          "label": "⛈️  Thunderstorm",
+          "labelKey": "menu_storm",
+          "command": "scene:storm"
+        },
+        {
+          "label": "🌨️  Snow",
+          "labelKey": "menu_snow",
+          "command": "scene:snow"
+        },
+        {
+          "label": "❄️  Blizzard",
+          "labelKey": "menu_blizzard",
+          "command": "scene:blizzard"
+        },
+        {
+          "label": "🌫️  Fog",
+          "labelKey": "menu_fog",
+          "command": "scene:fog"
+        },
+        {
+          "label": "🌸  Cherry Blossoms",
+          "labelKey": "menu_sakura",
+          "command": "scene:sakura"
+        },
+        {
+          "label": "🍂  Falling Leaves",
+          "labelKey": "menu_leaves",
+          "command": "scene:leaves"
+        },
+        {
+          "label": "✨  Fireflies",
+          "labelKey": "menu_fireflies",
+          "command": "scene:fireflies"
+        },
+        {
+          "label": "🌠  Meteor Shower",
+          "labelKey": "menu_meteors",
+          "command": "scene:meteors"
+        },
+        {
+          "separator": true
+        },
+        {
+          "label": "Pointer Is an Umbrella",
+          "labelKey": "menuPointer",
+          "command": "pointer"
+        },
+        {
+          "label": "Pause / Resume",
+          "labelKey": "menuPause",
+          "command": "pause",
+          "shortcut": "⌥⌘P"
+        },
+        {
+          "label": "Weather Panel…",
+          "labelKey": "menuPanel",
+          "command": "panel",
+          "shortcut": "⌥⌘O"
+        }
+      ]
+    }
+  ],
+  "widgets": [
+    {
+      "id": "now",
+      "title": "Outside Now",
+      "titleKey": "widgetNow",
+      "sizes": [
+        "small",
+        "medium"
+      ]
+    }
+  ],
+  "peers": [
+    "hoshino-pet"
+  ]
+}

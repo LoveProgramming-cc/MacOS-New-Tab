@@ -1,0 +1,114 @@
+/* A frameless, transparent window: what you see is the paper and nothing else. */
+html, body, #app-root { margin: 0; width: 100%; height: 100%; background: transparent; overflow: hidden; }
+.stage {
+  position: absolute; inset: 0;
+  --paper: #fbfaf5; --shade: #e4dfd2; --edge: rgba(90, 70, 40, 0.28); --ink: #2f2a24; --ink2: rgba(60, 50, 40, 0.6); --rule: rgba(80, 120, 190, 0.18); --margin: rgba(220, 90, 90, 0.35);
+  --accent: #e8743b;
+  font: 14px/1.5 -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+  color: var(--ink);
+  user-select: none; -webkit-user-select: none;
+}
+.stage[data-paper="blue"]   { --paper: #eef4ff; --shade: #cddcf5; --edge: rgba(40, 70, 130, 0.28); }
+.stage[data-paper="pink"]   { --paper: #fff0f3; --shade: #f5cfd8; --edge: rgba(140, 50, 80, 0.26); }
+.stage[data-paper="yellow"] { --paper: #fff8d8; --shade: #f0e2a6; --edge: rgba(130, 100, 20, 0.28); }
+.stage[data-paper="green"]  { --paper: #eef8ee; --shade: #cfe6cf; --edge: rgba(40, 100, 50, 0.26); }
+[hidden] { display: none !important; }
+
+/* ---- the plane ---------------------------------------------------------------------------- */
+.plane { position: absolute; width: 110px; height: 66px; margin: -33px 0 0 -55px; left: 75px; top: 50px; cursor: grab; touch-action: none; }
+.layout-park .plane { left: 140px; top: 122px; }
+.layout-card .plane { left: 246px; top: 286px; }
+.plane.dragging { cursor: grabbing; }
+.plane-art { width: 100%; height: 100%; transform: rotate(var(--angle, 0deg)) scaleX(var(--dir, 1)); transition: opacity 420ms ease, scale 420ms ease; }
+.plane-art svg { width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.22)); }
+.p-top { fill: var(--paper); stroke: var(--edge); stroke-width: 0.8; stroke-linejoin: round; }
+.p-keel { fill: var(--shade); stroke: var(--edge); stroke-width: 0.8; stroke-linejoin: round; }
+.p-far { fill: var(--shade); opacity: 0.8; stroke: var(--edge); stroke-width: 0.6; stroke-linejoin: round; }
+.p-crease { fill: none; stroke: var(--edge); stroke-width: 0.6; }
+.plane.bob .plane-art { animation: bob 2.4s ease-in-out infinite; }
+@keyframes bob { 0%, 100% { translate: 0 0; rotate: -2deg; } 50% { translate: 0 -5px; rotate: 2deg; } }
+.plane.away .plane-art { opacity: 0; scale: 0.35; }
+.plane.arrive .plane-art { animation: arrive 600ms ease-out; }
+@keyframes arrive { from { opacity: 0; scale: 0.4; } to { opacity: 1; scale: 1; } }
+.plane.appear .plane-art { animation: appear 420ms cubic-bezier(.2, .9, .3, 1.3); }
+@keyframes appear { from { opacity: 0; scale: 0.3; rotate: -40deg; } to { opacity: 1; scale: 1; rotate: 0deg; } }
+.badge {
+  position: absolute; right: 4px; top: -6px; width: 22px; height: 22px; border-radius: 11px;
+  background: var(--accent); color: #fff; font-size: 12px; line-height: 22px; text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25); animation: pulse 1.6s ease-in-out infinite;
+}
+@keyframes pulse { 50% { scale: 1.15; } }
+
+.bubble {
+  position: absolute; left: 140px; bottom: 92px; transform: translateX(-50%);
+  max-width: 260px; box-sizing: border-box; width: max-content;
+  padding: 7px 12px; border-radius: 14px; background: rgba(255, 255, 255, 0.97); color: #2b2b2b;
+  font-size: 12.5px; line-height: 1.35; text-align: center; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+  animation: bubble-in 260ms cubic-bezier(.2, .9, .3, 1.3); cursor: default;
+}
+.bubble::after { content: ""; position: absolute; left: 50%; bottom: -6px; width: 12px; height: 12px; margin-left: -6px; background: inherit; transform: rotate(45deg); border-radius: 2px; }
+.bubble b { color: var(--accent); }
+@keyframes bubble-in { from { opacity: 0; translate: 0 6px; } to { opacity: 1; translate: 0 0; } }
+
+/* ---- cards: writing, reading, the mailbox ---------------------------------------------------- */
+.card {
+  position: absolute; left: 36px; top: 36px; width: 420px; height: 500px; box-sizing: border-box;
+  display: flex; flex-direction: column; padding: 18px 22px 16px; border-radius: 6px;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.24), 0 2px 6px rgba(0, 0, 0, 0.14);
+  animation: card-in 340ms cubic-bezier(.2, .9, .3, 1.15);
+}
+@keyframes card-in { from { opacity: 0; transform: scale(0.82) rotate(-3deg); } to { opacity: 1; transform: rotate(-0.4deg); } }
+.paper { background: var(--paper); transform: rotate(-0.4deg); }
+.desk { background: #f7f4ee; border-radius: 14px; }
+.card.folding { animation: fold 700ms cubic-bezier(.6, 0, .8, .4) forwards; }
+@keyframes fold {
+  0% { transform: rotate(-0.4deg); }
+  35% { transform: scaleY(0.55) rotate(-4deg); border-radius: 4px; }
+  70% { transform: scale(0.35, 0.22) rotate(-14deg); opacity: 0.9; }
+  100% { transform: scale(0.05) rotate(-30deg); opacity: 0; }
+}
+.card.shake { animation: shake 360ms; }
+@keyframes shake { 20%, 60% { translate: -7px 0; } 40%, 80% { translate: 7px 0; } }
+
+.card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 10px; cursor: grab; }
+.card-title { font: 600 19px/1.3 "Kaiti SC", "STKaiti", "KaiTi", "Bradley Hand", Georgia, serif; }
+.card-sub { color: var(--ink2); font-size: 12px; margin-top: 2px; }
+.x { border: 0; background: rgba(0, 0, 0, 0.06); color: var(--ink2); width: 24px; height: 24px; border-radius: 12px; font-size: 16px; line-height: 22px; padding: 0; cursor: pointer; flex: 0 0 auto; }
+
+.lines {
+  flex: 1; min-height: 0; box-sizing: border-box; width: 100%; resize: none; border: 0; outline: none; margin: 0;
+  padding: 2px 6px 0 30px; color: var(--ink); background-color: transparent;
+  font: 17px/28px "Kaiti SC", "STKaiti", "KaiTi", "Bradley Hand", Georgia, serif;
+  background-image: linear-gradient(90deg, transparent 22px, var(--margin) 22px, var(--margin) 23px, transparent 23px),
+                    repeating-linear-gradient(transparent 0 27px, var(--rule) 27px 28px);
+  background-attachment: local; user-select: text; -webkit-user-select: text;
+}
+.lines::placeholder { color: rgba(60, 50, 40, 0.35); }
+.body { overflow-y: auto; white-space: pre-wrap; word-break: break-word; }
+
+.label { font-size: 12px; color: var(--ink2); margin: 10px 0 6px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { border: 1px solid var(--edge); background: rgba(255, 255, 255, 0.55); color: var(--ink); font: inherit; font-size: 12.5px; padding: 3px 10px; border-radius: 13px; cursor: pointer; }
+.chip.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+.card-foot { display: flex; align-items: center; gap: 8px; margin-top: 14px; }
+.grow { flex: 1; }
+.papers { display: flex; gap: 7px; flex: 1; }
+.dot { width: 20px; height: 20px; border-radius: 10px; border: 1px solid rgba(0, 0, 0, 0.18); cursor: pointer; padding: 0; }
+.dot.on { box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--accent); }
+.primary, .plain { font: inherit; font-size: 13px; border-radius: 8px; padding: 6px 14px; cursor: pointer; }
+.primary { border: 0; background: var(--accent); color: #fff; font-weight: 600; box-shadow: 0 2px 6px rgba(232, 116, 59, 0.35); }
+.primary:hover { filter: brightness(1.05); }
+.plain { border: 1px solid var(--edge); background: rgba(255, 255, 255, 0.6); color: var(--ink); }
+.danger { color: #c4372c; }
+.refly { margin-top: 4px; }
+
+.box-scroll { flex: 1; min-height: 0; overflow-y: auto; margin: 0 -6px; padding: 0 6px; }
+.box-list { display: flex; flex-direction: column; gap: 4px; }
+.box-item { display: flex; gap: 10px; align-items: center; text-align: left; width: 100%; border: 0; border-radius: 9px; padding: 8px 10px; background: rgba(0, 0, 0, 0.035); color: var(--ink); font: inherit; cursor: pointer; }
+.box-item:hover { background: rgba(0, 0, 0, 0.07); }
+.box-item.sealed { cursor: default; opacity: 0.8; }
+.box-item .ico { font-size: 18px; flex: 0 0 auto; }
+.box-item .txt { flex: 1; min-width: 0; }
+.box-item .t1 { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: "Kaiti SC", "STKaiti", "KaiTi", Georgia, serif; font-size: 15px; }
+.box-item .t2 { font-size: 11.5px; color: var(--ink2); }
+.empty { color: var(--ink2); font-size: 12.5px; padding: 6px 10px 10px; }

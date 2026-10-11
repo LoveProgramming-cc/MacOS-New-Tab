@@ -1,0 +1,310 @@
+/* Application windows and the host-rendered native UI.
+   The stylesheets are loaded in the order of their numbers; later files refine earlier ones. */
+/* Sandboxed application plugins: macOS-style windows; app content itself stays isolated. */
+/* Application windows use the system window material: the element also carries
+   .mac-acrylic.window-shadow (added in plugin-system.js), so it gets exactly the same
+   acrylic tint, blur, border and shadow as a system .window — including while it is
+   being dragged — and the developer transparency / contrast modes apply unchanged. */
+.plugin-app-window {
+    --plugin-titlebar-surface:rgba(255,255,255,.10);
+    position:fixed; display:flex; flex-direction:column; overflow:hidden; box-sizing:border-box;
+    border-radius:var(--plugin-window-radius,13px); z-index:6100;
+    background-clip:padding-box !important; -webkit-backface-visibility:hidden; backface-visibility:hidden;
+}
+/* The window's colour scheme is the one its application's document uses. When the two differ
+   Chrome puts an opaque backdrop behind the application's frame — a dark plate under a
+   transparent window in dark mode. */
+body.dark-mode .plugin-app-window { --plugin-titlebar-surface:rgba(255,255,255,.055); }
+body.dark-mode .plugin-app-window:not(.plugin-app-force-light) { color-scheme:dark; }
+/* A window that pins its appearance carries that theme's system tokens itself. */
+.plugin-app-window.plugin-app-force-dark {
+    --acrylic-bg:rgba(40,40,40,.65); --acrylic-border:.5px solid rgba(255,255,255,.15);
+    --solid-bg:#1e1e1e; --text-main:#fff; --text-muted:#aaa; --plugin-titlebar-surface:rgba(255,255,255,.055);
+    --window-shadow:0 18px 100px 0 rgba(0,0,0,.40),0 0 1.5px 0 rgba(255,255,255,.2);
+    color-scheme:dark;
+}
+.plugin-app-window.plugin-app-force-light {
+    --acrylic-bg:rgba(246,246,246,.55); --acrylic-border:.5px solid rgba(0,0,0,.15);
+    --solid-bg:#fafafa; --text-main:#222; --text-muted:#666; --plugin-titlebar-surface:rgba(255,255,255,.10);
+    --window-shadow:0 18px 100px 0 rgba(0,0,0,.20),0 0 1.5px 0 rgba(0,0,0,.275);
+    color-scheme:light;
+}
+body.dev-reduce-transparency .plugin-app-window.plugin-app-force-dark { --acrylic-bg:rgba(36,36,39,.99); }
+body.dev-reduce-transparency .plugin-app-window.plugin-app-force-light { --acrylic-bg:rgba(246,246,248,.985); }
+body.dev-increase-contrast .plugin-app-window.plugin-app-force-dark { --acrylic-border:1px solid rgba(255,255,255,.46); }
+body.dev-increase-contrast .plugin-app-window.plugin-app-force-light { --acrylic-border:1px solid rgba(20,20,24,.42); }
+.plugin-app-window.plugin-app-material-solid { -webkit-backdrop-filter:none !important; backdrop-filter:none !important; background-color:var(--solid-bg) !important; }
+.plugin-app-window.plugin-app-material-transparent { -webkit-backdrop-filter:none !important; backdrop-filter:none !important; background-color:transparent !important; box-shadow:none !important; }
+.plugin-app-window.hidden { display:none !important; }
+.plugin-app-resizable { resize:both; }
+.plugin-app-titlebar { box-sizing:border-box; flex:0 0 var(--plugin-titlebar-height,36px); display:grid; grid-template-columns:76px 1fr 76px; align-items:center; padding:0 10px; background:var(--plugin-titlebar-surface); border-bottom:1px solid rgba(120,120,125,.16); user-select:none; cursor:default; }
+.plugin-app-controls { display:flex; gap:8px; align-items:center; }
+.plugin-app-dot { width:12px; height:12px; border:0; border-radius:50%; padding:0; box-shadow:inset 0 0 0 .5px rgba(0,0,0,.16); }
+.plugin-app-dot.close{background:#ff5f57}.plugin-app-dot.minimize{background:#febc2e}.plugin-app-dot.maximize{background:#28c840}
+.plugin-app-identity { min-width:0; display:flex; justify-content:center; align-items:center; gap:7px; }
+.plugin-app-title { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:12px; font-weight:600; }
+.plugin-app-icon { display:inline-grid; place-items:center; flex:0 0 auto; overflow:hidden; border-radius:9px; }
+.plugin-app-icon img { width:100%; height:100%; object-fit:cover; }
+.plugin-app-frame { flex:1 1 auto; width:100%; min-height:0; border:0; background:transparent; transform:translateZ(0); backface-visibility:hidden; contain:strict; }
+.plugin-app-loading-view,.plugin-app-crash-view { position:absolute; inset:var(--plugin-titlebar-height,36px) 0 0; display:none; place-items:center; padding:22px; text-align:center; background:rgba(246,246,248,.85); z-index:3; }
+.plugin-app-loading .plugin-app-loading-view { display:grid; }
+.plugin-app-crashed .plugin-app-loading-view { display:none; }
+.plugin-app-crashed .plugin-app-crash-view { display:grid; align-content:center; gap:14px; }
+.plugin-app-crash-text { max-width:min(620px,90%); max-height:45vh; overflow:auto; white-space:pre-wrap; text-align: start; font:11px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace; }
+.application-plugin-row { display:flex; flex-direction:column; gap:10px; padding:14px 0; border-bottom:1px solid rgba(128,128,132,.13); }
+.application-plugin-row:last-child { border-bottom:0; }
+.application-plugin-head { display:grid; grid-template-columns:42px minmax(0,1fr); align-items:start; gap:12px; }
+.application-plugin-info { min-width:0; display:flex; flex-direction:column; gap:3px; }
+.application-plugin-heading { display:flex; align-items:baseline; gap:8px; min-width:0; }
+.application-plugin-heading > strong { font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.application-plugin-version { flex:0 0 auto; color:var(--text-muted); font-size:11px; }
+.application-plugin-badge { flex:0 0 auto; padding:1px 6px; border-radius:999px; background:rgba(var(--accent-rgb),.14); color:var(--accent); font-size:10px; font-weight:600; }
+.application-plugin-info > span { color:var(--text-muted); font-size:11px; line-height:1.4; overflow-wrap:anywhere; }
+.application-plugin-footer { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px 12px; padding-inline-start:54px; }
+.application-plugin-autostart { display:inline-flex; align-items:center; gap:8px; font-size:12px; color:var(--text-main); cursor:default; }
+.application-plugin-actions { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:6px; margin-inline-start:auto; }
+.plugin-app-empty { padding:18px; color:var(--text-muted); text-align:center; }
+.plugin-runtime-disabled { opacity:.58; }
+@media(max-width:760px){
+  .application-plugin-footer{padding-inline-start:0}
+}
+/* Unified window-drag compositor path. While any host window is moving, plugin iframes
+   cannot intercept pointer events, and the moving window is transformed as one layer
+   instead of forcing layout for every sample. The window material is not touched:
+   application windows keep the same frosted glass as system windows during a drag. */
+.global-window-drag-active .plugin-app-frame { pointer-events:none !important; }
+/* An application carries its own window: no other application's document takes the pointer, so a release its document misses reaches the host. */
+body.plugin-self-dragging .plugin-app-window:not(.plugin-app-self-dragging) .plugin-app-frame { pointer-events:none !important; }
+.window-drag-moving {
+    will-change:transform !important;
+    contain:layout paint style;
+    cursor:grabbing !important;
+}
+.plugin-app-window { isolation:isolate; contain:layout paint style; }
+
+.plugin-app-identity-hidden { visibility:hidden; }
+
+/* Developer Beta 0.55.0: keep loading/crash surfaces consistent with a forced-dark application window. */
+.plugin-app-force-dark .plugin-app-loading-view,
+.plugin-app-force-dark .plugin-app-crash-view {
+    background: rgba(35, 35, 38, .96) !important;
+    color: rgba(255, 255, 255, .94) !important;
+}
+.plugin-app-force-light .plugin-app-loading-view,
+.plugin-app-force-light .plugin-app-crash-view {
+    background: rgba(245, 245, 247, .96) !important;
+    color: rgba(0, 0, 0, .88) !important;
+}
+.plugin-app-dot:disabled,
+.plugin-app-dot.maximize:disabled {
+    background:#54565a !important;
+    opacity:.82;
+    cursor:default;
+}
+
+
+.plugin-app-window .plugin-app-titlebar { background:var(--plugin-titlebar-surface) !important; }
+.plugin-app-frame { box-sizing:border-box; }
+#launchpad-grid.launchpad-page-committed { scroll-snap-type:none !important; }
+
+
+/* Developer Beta 0.55.0 — dragging an application never distorts the Dock target.
+   Dock magnification is frozen for the entire drag and no hover tooltip is painted. */
+body.global-app-drag-active #dock .dock-item { width:var(--dock-size) !important; transform:none !important; }
+body.global-app-drag-active #dock .dock-separator { transform:none !important; }
+body.global-app-drag-active #dock-plate { left:0 !important; right:0 !important; }
+body.global-app-drag-active #dock .dock-icon { transform:none !important; }
+body.global-app-drag-active #dock .dock-item::after { opacity:0 !important; content:none !important; }
+body.global-app-drag-active #dock { --dock-tooltip-lift:0px; }
+.dock-trash-item.trash-drop-ready { transform:none !important; }
+.dock-trash-item.trash-drop-ready .dock-icon { transform:none !important; }
+
+/* Developer Beta 0.55.0 — host-rendered Native App surface.
+   Native applications render controls in the shell DOM, so they share the same
+   compositor/material and do not create a second visible document tree. */
+.plugin-native-app-frame {
+    flex:1 1 auto; min-width:0; min-height:0; overflow:auto; box-sizing:border-box;
+    padding:14px; color:inherit; font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue",Arial,"PingFang SC",sans-serif;
+    --native-text:currentColor;
+    --native-secondary:color-mix(in srgb,currentColor 62%,transparent);
+    --native-border:rgba(60,60,67,.18);
+    --native-control:rgba(255,255,255,.58);
+    --native-control-hover:rgba(255,255,255,.76);
+    --native-accent:var(--accent); --native-red:#ff453a;
+    --native-tertiary:color-mix(in srgb,currentColor 42%,transparent);
+    --native-fill:rgba(127,127,127,.18);
+    outline:none;
+}
+.plugin-app-window.plugin-app-force-dark .plugin-native-app-frame,
+body.dark-mode .plugin-app-window:not(.plugin-app-force-light) .plugin-native-app-frame {
+    --native-secondary:rgba(245,245,247,.62); --native-border:rgba(255,255,255,.15);
+    --native-control:rgba(116,116,122,.48); --native-control-hover:rgba(132,132,138,.58);
+}
+.plugin-app-runtime-frame { position:absolute !important; width:1px !important; height:1px !important; opacity:0 !important; pointer-events:none !important; border:0 !important; clip-path:inset(50%) !important; }
+.plugin-native-stack { display:flex; min-width:0; min-height:0; gap:var(--native-gap,10px); }
+.plugin-native-stack.vertical { flex-direction:column; }
+.plugin-native-stack.horizontal { flex-direction:row; align-items:center; }
+.plugin-native-card { padding:12px; border-radius:13px; background:rgba(127,127,127,.10); border:1px solid var(--native-border); display:flex; flex-direction:column; gap:10px; }
+.plugin-native-toolbar { min-height:38px; display:flex; align-items:center; gap:8px; padding:4px 8px; border-bottom:1px solid var(--native-border); }
+.plugin-native-text { font-size:13px; line-height:1.4; color:var(--native-text); }
+.plugin-native-text.title { font-size:20px; font-weight:600; letter-spacing:-.01em; }
+.plugin-native-text.caption,.plugin-native-text.muted { font-size:12px; color:var(--native-secondary); }
+.plugin-native-button { appearance:none; min-height:28px; padding:4px 12px; border-radius:8px; border:1px solid var(--native-border); color:inherit; background:var(--native-control); font:500 13px/1.2 inherit; cursor:default; }
+.plugin-native-button:hover { background:var(--native-control-hover); }
+.plugin-native-button:active { filter:brightness(.94); }
+.plugin-native-button.primary { color:#fff; background:var(--native-accent); border-color:rgba(0,0,0,.08); }
+.plugin-native-button.danger { color:#fff; background:var(--native-red); border-color:rgba(0,0,0,.08); }
+.plugin-native-input,.plugin-native-select { box-sizing:border-box; min-height:30px; padding:5px 9px; border:1px solid var(--native-border); border-radius:8px; color:inherit; background:var(--native-control); font:13px inherit; outline:none; }
+.plugin-native-input:focus,.plugin-native-select:focus { border-color:var(--native-accent); box-shadow:0 0 0 3px rgba(var(--accent-rgb),.18); }
+.plugin-native-switch { position:relative; display:inline-flex; align-items:center; gap:8px; min-height:22px; }
+.plugin-native-switch>input { position:absolute; opacity:0; pointer-events:none; }
+.plugin-native-switch>span:not(.plugin-native-control-label) { position:relative; display:block; width:38px; height:22px; flex:0 0 38px; border-radius:999px; background:#8e8e93; }
+.plugin-native-switch>span:not(.plugin-native-control-label)::after { content:""; position:absolute; width:18px; height:18px; left:2px; top:2px; border-radius:50%; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.25); transition:transform .16s ease; }
+.plugin-native-switch>input:checked+span:not(.plugin-native-control-label) { background:#30d158; }
+.plugin-native-switch>input:checked+span:not(.plugin-native-control-label)::after { transform:translateX(16px); }
+.plugin-native-checkbox { display:inline-flex; align-items:center; gap:7px; font-size:13px; }
+.plugin-native-checkbox>input { appearance:none; width:16px; height:16px; margin:0; border-radius:4px; border:1px solid var(--native-border); background:var(--native-control); display:grid; place-items:center; }
+.plugin-native-checkbox>input:checked { background:var(--native-accent); border-color:var(--native-accent); }
+.plugin-native-checkbox>input:checked::after { content:"✓"; color:#fff; font:700 12px/1 inherit; }
+.plugin-native-slider { appearance:none; width:100%; height:20px; background:transparent; }
+.plugin-native-slider::-webkit-slider-runnable-track { height:4px; border-radius:999px; background:rgba(127,127,127,.28); }
+.plugin-native-slider::-webkit-slider-thumb { appearance:none; width:16px; height:16px; margin-top:-6px; border-radius:50%; background:#fff; border:1px solid rgba(0,0,0,.16); box-shadow:0 1px 5px rgba(0,0,0,.25); }
+.plugin-native-progress { appearance:none; width:100%; height:6px; border:0; border-radius:999px; overflow:hidden; background:rgba(127,127,127,.20); }
+.plugin-native-progress::-webkit-progress-bar { background:rgba(127,127,127,.20); }
+.plugin-native-progress::-webkit-progress-value { background:var(--native-accent); }
+.plugin-native-image { display:block; max-width:100%; max-height:100%; object-fit:contain; }
+.plugin-native-separator { height:1px; background:var(--native-border); }
+.plugin-native-spacer { flex:1 1 auto; min-width:4px; min-height:4px; }
+.plugin-native-control-label { font-size:13px; }
+/* Native UI v4: layout containers, text styles, button shapes, lists. Every value an app
+   can set arrives as a validated inline style from plugin-native-ui.js. */
+.plugin-native-app-frame-flush { padding:0; }
+.plugin-native-app-frame > * { min-height:100%; box-sizing:border-box; }
+.plugin-native-app-frame [hidden] { display:none !important; }
+.plugin-native-stack, .plugin-native-grid, .plugin-native-card, .plugin-native-toolbar { box-sizing:border-box; }
+.plugin-native-grid { display:grid; gap:var(--native-gap,10px); min-width:0; }
+.plugin-native-scroll { overflow-x:hidden; overflow-y:auto; }
+.plugin-native-scroll.horizontal { overflow-x:auto; overflow-y:hidden; }
+.plugin-native-scroll.both { overflow:auto; }
+/* What is inside a scroll view keeps its natural size along the scrolling axis: content
+   that does not fit scrolls, it is never squeezed to make room. */
+.plugin-native-scroll.vertical > *, .plugin-native-scroll.both > * { flex-shrink:0 !important; }
+.plugin-native-scroll.vertical > .plugin-native-stack, .plugin-native-scroll.both > .plugin-native-stack { min-height:auto; }
+.plugin-native-scroll.horizontal > *, .plugin-native-scroll.both > * { flex-shrink:0 !important; }
+.plugin-native-scroll.horizontal > .plugin-native-stack, .plugin-native-scroll.both > .plugin-native-stack { min-width:auto; }
+.plugin-native-text { min-width:0; overflow-wrap:anywhere; }
+.plugin-native-text.headline { font-size:15px; font-weight:600; }
+.plugin-native-text.display { font-size:34px; font-weight:300; line-height:1.1; letter-spacing:-.02em; }
+.plugin-native-text.mono { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12px; }
+.plugin-native-text.selectable { user-select:text; -webkit-user-select:text; cursor:text; }
+.plugin-native-text.clamped { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:var(--native-lines,1); overflow:hidden; max-width:100%; }
+.plugin-native-button { display:inline-flex; align-items:center; justify-content:center; gap:6px; box-sizing:border-box; }
+.plugin-native-button:disabled { opacity:.45; }
+.plugin-native-button.plain { background:transparent; border-color:transparent; }
+.plugin-native-button.plain:hover { background:var(--native-fill); }
+.plugin-native-button.tinted { color:var(--native-accent); background:rgba(var(--accent-rgb),.16); border-color:transparent; }
+.plugin-native-button.pill { border-radius:999px; }
+.plugin-native-button.circle { border-radius:50%; padding:0; border-color:transparent; aspect-ratio:1; }
+.plugin-native-button.circle:hover { filter:brightness(1.12); }
+.plugin-native-button.circle:active { filter:brightness(1.32); transform:scale(.985); }
+.plugin-native-button-icon { width:16px; height:16px; object-fit:contain; pointer-events:none; }
+.plugin-native-textarea { resize:none; line-height:1.4; font-family:inherit; }
+.plugin-native-segmented { display:inline-flex; padding:2px; gap:2px; border-radius:8px; background:var(--native-fill); }
+.plugin-native-segmented > button { appearance:none; border:0; border-radius:6px; padding:4px 12px; color:inherit; background:transparent; font:12px/1.3 inherit; cursor:default; }
+.plugin-native-segmented > button.active { background:var(--native-control); box-shadow:0 1px 4px rgba(0,0,0,.14); }
+.plugin-native-zstack { display:grid; grid-template-columns:minmax(0,1fr); grid-template-rows:minmax(0,1fr); min-width:0; min-height:0; box-sizing:border-box; }
+.plugin-native-zstack > * { grid-area:1 / 1; min-width:0; min-height:0; }
+.plugin-native-link { color:var(--native-accent); cursor:pointer; text-decoration:none; }
+.plugin-native-link:hover { text-decoration:underline; }
+.plugin-native-text code { padding:1px 5px; border-radius:5px; background:var(--native-fill); font:12px ui-monospace,SFMono-Regular,Menlo,monospace; }
+.plugin-native-canvas { display:block; min-width:0; touch-action:none; }
+.plugin-native-html { display:block; border:0; width:100%; min-height:60px; background:transparent; color-scheme:inherit; }
+/* list + table share one virtualised row engine: only the rows in view exist in the DOM. */
+.plugin-native-list, .plugin-native-table { position:relative; min-height:0; min-width:0; overflow-y:auto; overflow-x:hidden; box-sizing:border-box; border:1px solid var(--native-border); border-radius:10px; background:rgba(127,127,127,.06); outline:none; }
+.plugin-native-rows { position:relative; width:100%; }
+.plugin-native-list-row { position:absolute; left:0; right:0; box-sizing:border-box; display:flex; align-items:center; gap:10px; padding:0 10px; border-bottom:1px solid var(--native-border); cursor:default; }
+.plugin-native-list-row:hover, .plugin-native-table-row:hover { background:var(--native-fill); }
+.plugin-native-list-row.selected, .plugin-native-table-row.selected { background:var(--native-accent); color:#fff; }
+.plugin-native-list-row.selected .plugin-native-list-subtitle, .plugin-native-list-row.selected .plugin-native-list-detail, .plugin-native-table-row.selected .plugin-native-table-cell.muted { color:rgba(255,255,255,.8); }
+.plugin-native-list-row.disabled, .plugin-native-table-row.disabled { opacity:.45; }
+.plugin-native-list-body { flex:1 1 auto; min-width:0; }
+.plugin-native-list-title { font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.plugin-native-list-subtitle { font-size:11px; color:var(--native-secondary); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.plugin-native-list-detail { flex:0 0 auto; font-size:12px; color:var(--native-secondary); font-variant-numeric:tabular-nums; }
+.plugin-native-list-badge { flex:0 0 auto; padding:1px 7px; border-radius:999px; background:var(--native-fill); font-size:11px; }
+.plugin-native-list-icon { width:28px; height:28px; border-radius:6px; object-fit:cover; flex:0 0 auto; }
+.plugin-native-list-empty { padding:14px; text-align:center; font-size:12px; color:var(--native-secondary); }
+.plugin-native-list-empty[hidden] { display:none; }
+.plugin-native-table-header { position:sticky; top:0; z-index:2; display:grid; column-gap:10px; padding:0 10px; height:26px; align-items:center; border-bottom:1px solid var(--native-border); background:color-mix(in srgb, var(--acrylic-bg, #f6f6f6) 86%, transparent); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); font-size:11px; font-weight:600; color:var(--native-secondary); }
+.plugin-native-table-heading { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:default; }
+.plugin-native-table-heading.sortable:hover, .plugin-native-table-heading.sorted { color:var(--native-text); }
+.plugin-native-table-row { position:absolute; left:0; right:0; box-sizing:border-box; display:grid; column-gap:10px; align-items:center; padding:0 10px; font-size:12.5px; cursor:default; }
+.plugin-native-table-row.striped { background:rgba(127,127,127,.07); }
+.plugin-native-table-row.emphasis { color:var(--native-accent); font-weight:600; }
+.plugin-native-table-row.selected.emphasis { color:#fff; }
+.plugin-native-table-cell { display:flex; align-items:center; gap:8px; min-width:0; font-variant-numeric:tabular-nums; }
+.plugin-native-table-cell > span { flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.plugin-native-table-cell.muted { color:var(--native-secondary); }
+.plugin-native-table-icon { width:18px; height:18px; border-radius:4px; object-fit:cover; flex:0 0 auto; }
+.plugin-native-drop-marker { position:absolute; left:6px; right:6px; height:2px; border-radius:2px; background:var(--native-accent); pointer-events:none; z-index:3; }
+.plugin-native-list.reordering, .plugin-native-table.reordering { cursor:grabbing; user-select:none; }
+/* Context menus opened by native controls and macos.ui.showMenu(). */
+.plugin-context-menu { position:fixed; z-index:950000; min-width:170px; max-width:320px; max-height:70vh; overflow-y:auto; padding:5px; border-radius:10px; display:flex; flex-direction:column; }
+.plugin-context-item { appearance:none; border:0; background:transparent; color:inherit; text-align: start; font:13px/1.3 -apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC",sans-serif; padding:5px 10px; border-radius:6px; cursor:default; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:0 0 auto; }
+.plugin-context-item:hover:not(:disabled) { background:var(--accent); color:#fff; }
+.plugin-context-item:disabled { opacity:.4; }
+.plugin-context-item.danger { color:#ff453a; }
+.plugin-context-item.checked::before { content:"✓ "; }
+.plugin-context-item.has-submenu { display:flex; align-items:center; gap:14px; }
+.plugin-context-item.has-submenu::after { content:"›"; margin-inline-start:auto; opacity:.6; font-size:15px; line-height:1; }
+.plugin-context-item.has-submenu.open:not(:disabled) { background:var(--accent); color:#fff; }
+[dir="rtl"] .plugin-context-item.has-submenu::after { transform:scaleX(-1); }
+.plugin-context-separator { height:1px; margin:4px 8px; background:rgba(127,127,127,.3); flex:0 0 auto; }
+/* File drag from the desktop. */
+body.file-drag-active .plugin-app-frame { pointer-events:none !important; }
+.plugin-app-window.plugin-app-drop-target::after { content:""; position:absolute; inset:3px; border:2px dashed var(--accent); border-radius:calc(var(--plugin-window-radius,13px) - 3px); background:rgba(var(--accent-rgb),.10); pointer-events:none; z-index:5; }
+.mac-dialog-input { width:100%; box-sizing:border-box; margin-top:10px; }
+.file-drop-zone.file-drop-ready { outline:2px dashed var(--accent); outline-offset:3px; border-radius:8px; }
+body.desktop-file-drop::after { content:attr(data-drop-hint); position:fixed; inset:34px 10px 10px; z-index:899999; display:grid; place-items:center; border:2px dashed rgba(255,255,255,.85); border-radius:16px; background:rgba(var(--accent-rgb),.18); color:#fff; font:600 18px -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif; text-shadow:0 1px 6px rgba(0,0,0,.45); pointer-events:none; }
+.plugin-native-separator.vertical { width:1px; height:auto; align-self:stretch; }
+
+/* In-desktop notifications posted by applications (permission: notifications). */
+.app-notification-stack { position:fixed; top:34px; right:12px; z-index:900000; display:flex; flex-direction:column; gap:8px; width:min(340px,calc(100vw - 24px)); pointer-events:none; }
+.app-notification { display:flex; align-items:flex-start; gap:10px; padding:10px 12px; border-radius:14px; pointer-events:auto; cursor:default; animation:app-notification-in .22s cubic-bezier(.2,.8,.2,1); transition:opacity .2s ease, transform .2s ease; }
+.app-notification.leaving { opacity:0; transform:translateX(24px); }
+.app-notification-body { min-width:0; display:flex; flex-direction:column; gap:1px; }
+.app-notification-app { font-size:11px; color:var(--text-muted); }
+.app-notification-title { font-size:13px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.app-notification-title:empty, .app-notification-text:empty { display:none; }
+.app-notification-text { font-size:12px; line-height:1.35; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3; overflow:hidden; overflow-wrap:anywhere; }
+@keyframes app-notification-in { from { opacity:0; transform:translateX(24px); } to { opacity:1; transform:none; } }
+body.dev-disable-animations .app-notification { animation:none; transition:none; }
+
+body.dev-disable-animations .plugin-native-app-frame *,
+body.dev-disable-animations .plugin-native-app-frame *::before,
+body.dev-disable-animations .plugin-native-app-frame *::after { transition:none !important; animation:none !important; }
+
+/* Developer Beta 0.55.0 — active application menus share the system menu bar. */
+.menu-left { display:flex; align-items:center; min-width:0; height:100%; }
+.menu-app-items { display:flex; align-items:center; min-width:0; height:100%; }
+.menu-app-items.hidden { display:none !important; }
+.menu-app-items > span { margin-inline-end:18px; cursor:default; white-space:nowrap; }
+.plugin-menu-title { padding:2px 0; }
+.plugin-menu-title.active { font-weight:600; }
+.plugin-app-menu-dropdown { min-width:210px; z-index:99999 !important; }
+.plugin-app-menu-dropdown .plugin-menu-command { display:flex; justify-content:space-between; gap:28px; }
+.plugin-app-menu-dropdown .plugin-menu-shortcut { opacity:.58; margin-inline-start:auto; }
+.plugin-app-menu-dropdown .danger { color:#ff3b30; }
+.plugin-app-menu-dropdown .danger:hover { color:#fff; }
+
+/* Frameless application windows (window.titlebar "none"): no title bar, no window buttons,
+   no frame — only what the application draws. With material "transparent" not even a
+   surface, so a desktop pet is just its picture. The application moves the window itself. */
+.plugin-app-window.plugin-app-frameless .plugin-app-titlebar,
+.plugin-app-window.plugin-app-frameless .plugin-app-loading-view { display: none !important; }
+.plugin-app-window.plugin-app-frameless { min-width: 0 !important; min-height: 0 !important; }
+.plugin-app-window.plugin-app-material-transparent { border-color: transparent !important; }
+.plugin-app-window.plugin-app-frameless .plugin-app-crash-view { inset: 0; padding: 6px; font-size: 10px; }
+/* Floating windows step aside for full-screen system views. */
+body.launchpad-open .plugin-app-window[data-window-level],
+body.mission-control-open .plugin-app-window[data-window-level="floating"] { visibility: hidden; }

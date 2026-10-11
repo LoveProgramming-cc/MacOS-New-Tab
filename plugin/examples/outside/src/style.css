@@ -1,0 +1,76 @@
+/* The window is the whole desktop and draws nothing of its own but the weather. */
+html, body, #app-root { margin: 0; background: transparent; overflow: hidden; width: 100%; height: 100%; }
+.sky { position: fixed; left: 0; top: 0; pointer-events: none; contain: strict; }
+.shade { position: fixed; inset: 0; pointer-events: none; }
+
+.panel {
+  --ink: #1d1d1f; --ink2: rgba(60, 60, 67, 0.7); --line: rgba(0, 0, 0, 0.1);
+  --surface: rgba(248, 248, 250, 0.96); --raised: rgba(255, 255, 255, 0.9); --fill: rgba(120, 120, 128, 0.14);
+  --accent: #0a84ff; --accent-ink: #fff;
+}
+
+.panel.dark {
+  --ink: #f5f5f7; --ink2: rgba(235, 235, 245, 0.62); --line: rgba(255, 255, 255, 0.12);
+  --surface: rgba(38, 38, 42, 0.96); --raised: rgba(64, 64, 70, 0.9); --fill: rgba(120, 120, 128, 0.32);
+}
+
+.panel[hidden] { display: none; }
+.panel {
+  position: fixed; top: 12px; right: 12px; width: 336px; max-height: calc(100% - 24px); overflow-y: auto;
+  box-sizing: border-box; padding: 14px 14px 12px;
+  background: var(--surface); color: var(--ink);
+  border: 0.5px solid var(--line); border-radius: 16px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28), 0 2px 8px rgba(0, 0, 0, 0.12);
+  font: 13px/1.35 -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Helvetica Neue", sans-serif;
+  user-select: none; -webkit-user-select: none;
+  transform-origin: top right; animation: pop 180ms cubic-bezier(.2, .9, .3, 1.2);
+}
+@keyframes pop { from { opacity: 0; transform: scale(0.94) translateY(-6px); } to { opacity: 1; transform: none; } }
+
+.head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.now-emoji { font-size: 30px; width: 40px; text-align: center; line-height: 1; }
+.head-text { flex: 1; min-width: 0; }
+.app-name { font-weight: 700; font-size: 15px; }
+.now-line { color: var(--ink2); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.icon-btn { border: 0; background: var(--fill); color: var(--ink2); width: 22px; height: 22px; border-radius: 50%; font-size: 15px; line-height: 20px; padding: 0; cursor: pointer; }
+
+.seg { display: grid; grid-template-columns: 1fr 1fr; background: var(--fill); border-radius: 8px; padding: 2px; margin-bottom: 12px; }
+.seg button { border: 0; background: transparent; color: var(--ink); font: inherit; padding: 4px 0; border-radius: 6px; cursor: pointer; }
+.seg button.on { background: var(--raised); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15); font-weight: 600; }
+
+.live[hidden], .scenes[hidden] { display: none; }
+.city-row { display: flex; gap: 6px; }
+.field { flex: 1; min-width: 0; font: inherit; color: var(--ink); background: var(--raised); border: 0.5px solid var(--line); border-radius: 7px; padding: 5px 8px; outline: none; }
+.field:focus { box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent); }
+.btn { font: inherit; color: var(--ink); background: var(--raised); border: 0.5px solid var(--line); border-radius: 7px; padding: 4px 11px; cursor: pointer; box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.1); }
+.btn:active { filter: brightness(0.93); }
+.link { font: inherit; border: 0; background: none; color: var(--accent); cursor: pointer; padding: 0; }
+.muted { color: var(--ink2); font-size: 12px; }
+.results { display: flex; flex-direction: column; gap: 2px; margin: 6px 0 2px; }
+.results:empty { display: none; }
+.results button { text-align: left; font: inherit; color: var(--ink); background: transparent; border: 0; border-radius: 7px; padding: 5px 8px; cursor: pointer; }
+.results button:hover { background: var(--fill); }
+.results small { color: var(--ink2); margin-left: 6px; }
+.results .note { color: var(--ink2); padding: 4px 8px; font-size: 12px; }
+.live-foot { display: flex; justify-content: space-between; align-items: center; margin: 8px 2px 2px; }
+
+.scenes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.scene { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 2px 6px; border-radius: 10px; border: 0; background: var(--fill); color: var(--ink); font: inherit; font-size: 11px; cursor: pointer; transition: transform 120ms; }
+.scene:hover { transform: translateY(-1px); }
+.scene b { font-size: 22px; font-weight: 400; line-height: 1.1; }
+.scene.on { background: var(--accent); color: var(--accent-ink); }
+
+.rows { margin-top: 12px; border-top: 0.5px solid var(--line); padding-top: 6px; }
+.row { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 30px; }
+.slider-row span { flex: 0 0 auto; width: 52px; }
+.slider-row input { flex: 1; accent-color: var(--accent); }
+.slider-row.off { opacity: 0.45; }
+.toggle { cursor: pointer; }
+.toggle input { position: absolute; opacity: 0; pointer-events: none; }
+.toggle i { flex: 0 0 auto; position: relative; width: 32px; height: 19px; border-radius: 10px; background: var(--fill); transition: background 150ms; }
+.toggle i::after { content: ""; position: absolute; left: 2px; top: 2px; width: 15px; height: 15px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); transition: transform 150ms; }
+.toggle input:checked + i { background: var(--accent); }
+.toggle input:checked + i::after { transform: translateX(13px); }
+
+.foot { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+.foot .link { font-size: 11px; color: var(--ink2); }

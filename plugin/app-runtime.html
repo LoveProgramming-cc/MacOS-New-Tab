@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Plugin Runtime</title>
+<link rel="stylesheet" href="sdk/native-ui.css">
+<style>
+html,body,#app-root{width:100%;height:100%;margin:0;overflow:hidden;background:transparent}
+*{box-sizing:border-box}
+#app-root{position:relative}
+/* Host drags are latency-sensitive. Keep the app visible but stop generating new
+   animation/transition frames until the pointer is released. */
+html[data-host-dragging="1"] *,html[data-host-dragging="1"] *::before,html[data-host-dragging="1"] *::after{
+  animation-play-state:paused!important;transition-duration:0s!important;scroll-behavior:auto!important;
+}
+#runtime-error{position:absolute;inset:0;display:none;place-items:center;padding:24px;font:13px -apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif;background:rgba(20,20,22,.96);color:#fff;text-align:center;white-space:pre-wrap;z-index:2147483647}
+</style>
+</head>
+<body>
+<div id="app-root"></div>
+<div id="runtime-error"></div>
+<script src="app-runtime.js"></script>
+</body>
+</html>

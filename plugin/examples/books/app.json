@@ -1,0 +1,183 @@
+{
+  "id": "books",
+  "name": "Books",
+  "version": "1.8.3",
+  "kind": "app",
+  "runtime": "native",
+  "description": "Your own e-book library: import EPUB books and CBZ comics, browse them as a bookshelf, sort them into collections, and read with adjustable themes, fonts and layout, a table of contents, bookmarks and a daily reading goal.",
+  "icon": "assets/icon.png",
+  "accentColor": "orange",
+  "settings": true,
+  "permissions": [
+    "storage",
+    "files",
+    "notifications",
+    "widgets"
+  ],
+  "window": {
+    "width": 1040,
+    "height": 700,
+    "minWidth": 780,
+    "minHeight": 500,
+    "resizable": true,
+    "appearance": "system",
+    "material": "glass",
+    "borderRadius": 12,
+    "titlebar": "hidden"
+  },
+  "entry": {
+    "ui": "src/ui.json",
+    "script": [
+      "src/state.js",
+      "src/library-view.js",
+      "src/reader.js",
+      "src/sheets.js",
+      "src/navigation.js",
+      "src/epub.js",
+      "src/library.js",
+      "src/main.js"
+    ]
+  },
+  "locales": {
+    "en-US": "locales/en-US.json",
+    "zh-CN": "locales/zh-CN.json",
+    "ja-JP": "locales/ja-JP.json",
+    "ar": "locales/ar.json",
+    "ko-KR": "locales/ko-KR.json"
+  },
+  "menus": [
+    {
+      "title": "File",
+      "titleKey": "menuFile",
+      "items": [
+        {
+          "label": "Import Books…",
+          "labelKey": "menuImport",
+          "command": "import",
+          "shortcut": "⌥⌘O"
+        },
+        {
+          "label": "New Collection",
+          "labelKey": "newCollection",
+          "command": "new-collection",
+          "shortcut": "⌥⌘N"
+        },
+        {
+          "separator": true
+        },
+        {
+          "label": "Get Info",
+          "labelKey": "menuGetInfo",
+          "command": "info",
+          "shortcut": "⌥⌘I"
+        },
+        {
+          "label": "Export Book…",
+          "labelKey": "exportBook",
+          "command": "export-book",
+          "shortcut": "⌥⌘E"
+        }
+      ]
+    },
+    {
+      "title": "View",
+      "titleKey": "menuView",
+      "items": [
+        {
+          "label": "Library",
+          "labelKey": "menuLibrary",
+          "command": "library",
+          "shortcut": "⌥⌘L"
+        },
+        {
+          "label": "Table of Contents",
+          "labelKey": "contents",
+          "command": "toc",
+          "shortcut": "⌥⌘C"
+        },
+        {
+          "label": "Bookmarks",
+          "labelKey": "bookmarks",
+          "command": "bookmarks",
+          "shortcut": "⌥⌘K"
+        },
+        {
+          "label": "Appearance",
+          "labelKey": "appearance",
+          "command": "appearance",
+          "shortcut": "⌥⌘A"
+        },
+        {
+          "separator": true
+        },
+        {
+          "label": "Bigger Text",
+          "labelKey": "menuBigger",
+          "command": "bigger",
+          "shortcut": "⌥⌘="
+        },
+        {
+          "label": "Smaller Text",
+          "labelKey": "menuSmaller",
+          "command": "smaller",
+          "shortcut": "⌥⌘-"
+        }
+      ]
+    },
+    {
+      "title": "Go",
+      "titleKey": "menuGo",
+      "items": [
+        {
+          "label": "Next Page",
+          "labelKey": "menuNextPage",
+          "command": "next-page"
+        },
+        {
+          "label": "Previous Page",
+          "labelKey": "menuPrevPage",
+          "command": "prev-page"
+        },
+        {
+          "separator": true
+        },
+        {
+          "label": "Next Chapter",
+          "labelKey": "menuNextChapter",
+          "command": "next-chapter",
+          "shortcut": "⌥⌘]"
+        },
+        {
+          "label": "Previous Chapter",
+          "labelKey": "menuPrevChapter",
+          "command": "prev-chapter",
+          "shortcut": "⌥⌘["
+        },
+        {
+          "separator": true
+        },
+        {
+          "label": "Add Bookmark",
+          "labelKey": "menuBookmark",
+          "command": "bookmark",
+          "shortcut": "⌥⌘B"
+        }
+      ]
+    }
+  ],
+  "bundled": true,
+  "widgets": [
+    {
+      "id": "reading",
+      "title": "Continue Reading",
+      "titleKey": "continueReading",
+      "sizes": [
+        "small",
+        "medium"
+      ]
+    }
+  ],
+  "urlSchemes": [
+    "books"
+  ]
+}

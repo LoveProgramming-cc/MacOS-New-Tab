@@ -1,0 +1,53 @@
+{
+  "manifest_version": 3,
+  "name": "macOS New Tab",
+  "version": "0.6.2",
+  "description": "Public Beta 0.6.2: a macOS-style new tab with a Dock, Launchpad, widgets, Finder, System Settings and sandboxed applications.",
+  "chrome_url_overrides": {
+    "newtab": "index.html"
+  },
+  "permissions": [
+    "storage",
+    "unlimitedStorage",
+    "favicon",
+    "tabs",
+    "alarms",
+    "notifications",
+    "scripting",
+    "clipboardWrite"
+  ],
+  "host_permissions": [
+    "*://*.bing.com/*",
+    "https://api.open-meteo.com/*",
+    "https://geocoding-api.open-meteo.com/*",
+    "http://*/*",
+    "https://*/*"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'",
+    "sandbox": "sandbox allow-scripts; script-src 'self' 'unsafe-inline' 'unsafe-eval'; object-src 'none'"
+  },
+  "background": {
+    "service_worker": "js/background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "js/limit-overlay.js"
+      ],
+      "run_at": "document_start",
+      "all_frames": false
+    }
+  ],
+  "sandbox": {
+    "pages": [
+      "plugin/app-runtime.html",
+      "plugin/app-runtime-strict.html"
+    ]
+  }
+}

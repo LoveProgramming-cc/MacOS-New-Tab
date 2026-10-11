@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <defs>
+    <linearGradient id="b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4b5a70"/><stop offset="1" stop-color="#1b2330"/></linearGradient>
+    <linearGradient id="m" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#b9c4d2"/></linearGradient>
+    <linearGradient id="h" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5ac8fa"/><stop offset="1" stop-color="#0a84ff"/></linearGradient>
+  </defs>
+  <rect x="10" y="10" width="100" height="100" rx="23" fill="url(#b)"/>
+  <rect x="10.75" y="10.75" width="98.500" height="98.500" rx="22.250" fill="none" stroke="#fff" stroke-opacity=".18" stroke-width="1.500"/>
+  <!-- wrench -->
+  <g transform="rotate(45 60 60)">
+    <path d="M60 22a15 15 0 0 0-7 28.300V90a7 7 0 0 0 14 0V50.300A15 15 0 0 0 67 22.700V36l-7 4-7-4V22.700A15 15 0 0 1 60 22z" fill="url(#m)"/>
+    <circle cx="60" cy="89" r="2.600" fill="#1b2330"/>
+  </g>
+  <!-- screwdriver -->
+  <g transform="rotate(-45 60 60)">
+    <rect x="57.300" y="24" width="5.400" height="34" rx="1.200" fill="url(#m)"/>
+    <path d="M56 22h8l-1.200 5h-5.600z" fill="#dfe6ee"/>
+    <rect x="52.500" y="57" width="15" height="40" rx="7.500" fill="url(#h)"/>
+    <rect x="57" y="62" width="1.800" height="29" rx=".9" fill="#fff" fill-opacity=".45"/>
+    <rect x="61.200" y="62" width="1.800" height="29" rx=".9" fill="#fff" fill-opacity=".45"/>
+  </g>
+</svg>

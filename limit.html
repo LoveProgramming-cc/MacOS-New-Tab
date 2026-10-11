@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Daily Limit</title>
+<link rel="stylesheet" href="css/01-base.css">
+<link rel="stylesheet" href="css/02-desktop.css">
+<link rel="stylesheet" href="css/03-widgets.css">
+<link rel="stylesheet" href="css/04-system.css">
+<link rel="stylesheet" href="css/05-accessibility.css">
+<link rel="stylesheet" href="css/06-app-windows.css">
+<link rel="stylesheet" href="css/07-finder.css">
+<link rel="stylesheet" href="css/08-native-controls.css">
+<link rel="stylesheet" href="css/09-devtools.css">
+<link rel="stylesheet" href="css/10-features.css">
+</head>
+<body class="limit-page light-mode">
+<div class="limit-card mac-acrylic window-shadow">
+    <div class="limit-icon">⏳</div>
+    <h1 id="limit-title">今日使用限额已到</h1>
+    <p id="limit-host"></p>
+    <p id="limit-note">你可以再使用 5 分钟，并且之后仍可再次延迟。</p>
+    <button id="limit-delay" class="mac-btn blue">再使用 5 分钟</button>
+</div>
+<script type="module" src="js/limit.js"></script>
+</body>
+</html>

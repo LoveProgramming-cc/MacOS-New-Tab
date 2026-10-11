@@ -1,0 +1,75 @@
+/* macOS New Tab Application SDK Developer Beta 0.55.0 - trusted, bundled native UI primitives.
+   Application packages can use these classes without shipping their own glass/compositor code. */
+:root {
+  --macos-font:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue",Arial,"PingFang SC","Hiragino Sans GB",sans-serif;
+  --macos-text:#1d1d1f; --macos-secondary:rgba(29,29,31,.62);
+  --macos-glass:rgba(246,246,248,.52); --macos-glass-strong:rgba(246,246,248,.72);
+  --macos-control:rgba(255,255,255,.62); --macos-control-hover:rgba(255,255,255,.78);
+  --macos-border:rgba(60,60,67,.18); --macos-shadow:0 18px 48px rgba(0,0,0,.18);
+  --macos-blue:#0a84ff; --macos-red:#ff453a; --macos-orange:#ff9f0a;
+  color-scheme:light;
+}
+:root[data-theme="dark"] {
+  --macos-text:#f5f5f7; --macos-secondary:rgba(245,245,247,.62);
+  --macos-glass:rgba(36,36,39,.50); --macos-glass-strong:rgba(42,42,45,.72);
+  --macos-control:rgba(116,116,122,.48); --macos-control-hover:rgba(132,132,138,.58);
+  --macos-border:rgba(255,255,255,.15); --macos-shadow:0 22px 54px rgba(0,0,0,.32);
+  color-scheme:dark;
+}
+html,body,#app-root { font-family:var(--macos-font); color:var(--macos-text); }
+.macos-app { width:100%; height:100%; min-width:0; min-height:0; color:var(--macos-text); }
+/* The host application window owns the expensive real wallpaper backdrop blur. These
+   surfaces are translucent composited layers, so nested plugin UI does not create a
+   second tree of backdrop-filter surfaces. */
+.macos-glass,.macos-material-glass { background:var(--macos-glass); border:1px solid var(--macos-border); box-shadow:var(--macos-shadow); }
+.macos-glass-strong,.macos-material-glass-strong { background:var(--macos-glass-strong); border:1px solid var(--macos-border); box-shadow:var(--macos-shadow); }
+.macos-card { border-radius:14px; background:var(--macos-glass-strong); border:1px solid var(--macos-border); box-shadow:0 4px 18px rgba(0,0,0,.09); }
+.macos-toolbar { min-height:42px; display:flex; align-items:center; gap:8px; padding:6px 10px; border-bottom:1px solid var(--macos-border); background:rgba(127,127,127,.08); }
+.macos-separator { height:1px; background:var(--macos-border); border:0; margin:8px 0; }
+.macos-button { appearance:none; border:1px solid var(--macos-border); border-radius:8px; min-height:28px; padding:4px 12px; font:500 13px var(--macos-font); color:var(--macos-text); background:var(--macos-control); box-shadow:inset 0 1px 0 rgba(255,255,255,.18); cursor:default; }
+.macos-button:hover { background:var(--macos-control-hover); }
+.macos-button:active { transform:translateY(.5px); filter:brightness(.94); }
+.macos-button.primary { color:white; background:var(--macos-blue); border-color:rgba(0,0,0,.08); }
+.macos-button.danger { color:white; background:var(--macos-red); border-color:rgba(0,0,0,.08); }
+.macos-input,.macos-select { box-sizing:border-box; min-height:30px; border:1px solid var(--macos-border); border-radius:8px; padding:5px 9px; font:13px var(--macos-font); color:var(--macos-text); background:rgba(255,255,255,.50); outline:none; }
+:root[data-theme="dark"] .macos-input,:root[data-theme="dark"] .macos-select { background:rgba(80,80,84,.55); }
+.macos-input:focus,.macos-select:focus { border-color:var(--macos-blue); box-shadow:0 0 0 3px rgba(10,132,255,.18); }
+.macos-switch { position:relative; display:inline-block; width:38px; height:22px; }
+.macos-switch>input { position:absolute; opacity:0; pointer-events:none; }
+.macos-switch>span { position:absolute; inset:0; border-radius:999px; background:#8e8e93; transition:background .16s ease; }
+.macos-switch>span::after { content:""; position:absolute; width:18px; height:18px; left:2px; top:2px; border-radius:50%; background:white; box-shadow:0 1px 4px rgba(0,0,0,.25); transition:transform .16s ease; }
+.macos-switch>input:checked+span { background:#30d158; }
+.macos-switch>input:checked+span::after { transform:translateX(16px); }
+.macos-segmented { display:inline-flex; padding:2px; gap:2px; border-radius:8px; background:rgba(127,127,127,.18); }
+.macos-segmented>button { border:0; border-radius:6px; padding:4px 10px; color:var(--macos-text); background:transparent; font:12px var(--macos-font); }
+.macos-segmented>button.active { background:var(--macos-control); box-shadow:0 1px 4px rgba(0,0,0,.13); }
+.macos-list { margin:0; padding:0; list-style:none; overflow:hidden; border-radius:12px; border:1px solid var(--macos-border); background:var(--macos-glass-strong); }
+.macos-list>li { min-height:36px; display:flex; align-items:center; padding:6px 12px; border-bottom:1px solid var(--macos-border); }
+.macos-list>li:last-child { border-bottom:0; }
+.macos-muted { color:var(--macos-secondary); }
+.macos-title { font:600 20px/1.2 var(--macos-font); letter-spacing:-.01em; }
+.macos-caption { font:12px/1.35 var(--macos-font); color:var(--macos-secondary); }
+@media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.001ms!important; animation-iteration-count:1!important; transition-duration:.001ms!important; } }
+
+/* Additional low-cost native controls. All are CSS-only and inherit the host theme. */
+.macos-icon-button{appearance:none;width:30px;height:30px;display:inline-grid;place-items:center;padding:0;border:1px solid transparent;border-radius:8px;background:transparent;color:var(--macos-text);font:16px var(--macos-font)}
+.macos-icon-button:hover{background:rgba(127,127,127,.14);border-color:var(--macos-border)}
+.macos-checkbox{display:inline-flex;align-items:center;gap:7px;font:13px var(--macos-font);color:var(--macos-text)}
+.macos-checkbox>input{appearance:none;width:16px;height:16px;margin:0;border-radius:4px;border:1px solid var(--macos-border);background:var(--macos-control);display:grid;place-items:center}
+.macos-checkbox>input:checked{background:var(--macos-blue);border-color:var(--macos-blue)}
+.macos-checkbox>input:checked::after{content:"✓";color:#fff;font:700 12px/1 var(--macos-font)}
+.macos-slider{appearance:none;width:100%;height:20px;background:transparent}
+.macos-slider::-webkit-slider-runnable-track{height:4px;border-radius:999px;background:rgba(127,127,127,.28)}
+.macos-slider::-webkit-slider-thumb{appearance:none;width:16px;height:16px;margin-top:-6px;border-radius:50%;background:#fff;border:1px solid rgba(0,0,0,.16);box-shadow:0 1px 5px rgba(0,0,0,.25)}
+.macos-progress{appearance:none;width:100%;height:6px;border:0;border-radius:999px;overflow:hidden;background:rgba(127,127,127,.20)}
+.macos-progress::-webkit-progress-bar{background:rgba(127,127,127,.20)}
+.macos-progress::-webkit-progress-value{background:var(--macos-blue);border-radius:999px}
+.macos-panel{border-radius:12px;background:var(--macos-glass);border:1px solid var(--macos-border);box-shadow:0 10px 30px rgba(0,0,0,.10)}
+.macos-group{display:flex;align-items:center;gap:8px;min-width:0}
+.macos-group.vertical{flex-direction:column;align-items:stretch}
+.macos-sidebar{background:rgba(127,127,127,.10);border-right:1px solid var(--macos-border)}
+.macos-sheet{border-radius:16px;background:var(--macos-glass-strong);border:1px solid var(--macos-border);box-shadow:0 26px 70px rgba(0,0,0,.24)}
+.macos-badge{display:inline-flex;align-items:center;justify-content:center;min-height:18px;padding:1px 7px;border-radius:999px;background:rgba(127,127,127,.18);color:var(--macos-secondary);font:600 11px var(--macos-font)}
+.macos-menu{min-width:180px;padding:5px;border-radius:10px;background:var(--macos-glass-strong);border:1px solid var(--macos-border);box-shadow:var(--macos-shadow)}
+.macos-menu-item{min-height:28px;display:flex;align-items:center;gap:8px;padding:3px 8px;border-radius:6px;font:13px var(--macos-font)}
+.macos-menu-item:hover{color:#fff;background:var(--macos-blue)}

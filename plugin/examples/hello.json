@@ -1,0 +1,21 @@
+{
+  "id": "hello-app",
+  "name": "Hello",
+  "version": "1.0.0",
+  "kind": "app",
+  "description": "Example application",
+  "icon": "data:image/svg+xml;base64,...",
+  "permissions": ["storage"],
+  "window": {
+    "width": 520,
+    "height": 420,
+    "minWidth": 320,
+    "minHeight": 240,
+    "resizable": true
+  },
+  "app": {
+    "html": "<main id=\"app\"><button id=\"save\">Save</button></main>",
+    "css": "html,body,#app{height:100%;margin:0}",
+    "script": "root.querySelector('#save').onclick=()=>macos.storage.set('clicked',true);"
+  }
+}

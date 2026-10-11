@@ -1,0 +1,66 @@
+{
+  "format": "macos-app-package-v3",
+  "id": "native-counter-example",
+  "name": "Native Counter",
+  "version": "1.0.0",
+  "kind": "app",
+  "runtime": "native",
+  "description": "Host-rendered Native App SDK example. The visible UI lives in the system shell; only logic runs in the sandbox.",
+  "permissions": [
+    "storage"
+  ],
+  "window": {
+    "width": 360,
+    "height": 250,
+    "minWidth": 320,
+    "minHeight": 220,
+    "resizable": true,
+    "appearance": "system",
+    "material": "glass",
+    "titlebarHeight": 36,
+    "showTitle": true,
+    "borderRadius": 13
+  },
+  "entry": {
+    "ui": "src/ui.json",
+    "script": "src/main.js"
+  },
+  "locales": {
+    "en-US": "locales/en-US.json",
+    "zh-CN": "locales/zh-CN.json",
+    "ja-JP": "locales/ja-JP.json"
+  },
+  "menus": [
+    {
+      "title": "App",
+      "items": [
+        {
+          "label": "Reset",
+          "command": "reset"
+        }
+      ]
+    }
+  ],
+  "files": {
+    "src/ui.json": {
+      "mime": "application/json",
+      "text": "{\"type\": \"stack\", \"id\": \"root\", \"direction\": \"vertical\", \"gap\": 12, \"children\": [{\"type\": \"text\", \"id\": \"title\", \"textKey\": \"title\", \"text\": \"Counter\", \"variant\": \"title\"}, {\"type\": \"text\", \"id\": \"value\", \"text\": \"0\"}, {\"type\": \"group\", \"direction\": \"horizontal\", \"gap\": 8, \"children\": [{\"type\": \"button\", \"id\": \"minus\", \"labelKey\": \"minus\", \"label\": \"Decrease\"}, {\"type\": \"button\", \"id\": \"plus\", \"labelKey\": \"plus\", \"label\": \"Increase\", \"variant\": \"primary\"}]}]}"
+    },
+    "src/main.js": {
+      "mime": "text/javascript",
+      "text": "let value = Number(await macos.storage.get('value')) || 0;\nawait macos.ui.patch('value', { text: String(value) });\nmacos.on('ui', async ({ id, event }) => {\n  if (event !== 'click' || !['minus','plus'].includes(id)) return;\n  value += id === 'plus' ? 1 : -1;\n  await macos.ui.patch('value', { text: String(value) });\n  await macos.storage.set('value', value);\n});\n\nmacos.on('menucommand', async ({ command }) => {\n  if (command !== 'reset') return;\n  value = 0;\n  await macos.ui.patch('value', { text: '0' });\n  await macos.storage.set('value', value);\n});\n"
+    },
+    "locales/en-US.json": {
+      "mime": "application/json",
+      "text": "{\"title\": \"Native Counter\", \"minus\": \"Decrease\", \"plus\": \"Increase\"}"
+    },
+    "locales/zh-CN.json": {
+      "mime": "application/json",
+      "text": "{\"title\": \"原生计数器\", \"minus\": \"减少\", \"plus\": \"增加\"}"
+    },
+    "locales/ja-JP.json": {
+      "mime": "application/json",
+      "text": "{\"title\": \"ネイティブカウンター\", \"minus\": \"減らす\", \"plus\": \"増やす\"}"
+    }
+  }
+}

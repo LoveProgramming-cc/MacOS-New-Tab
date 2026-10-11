@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>macOS New Tab</title>
+    <!-- MV3-safe first-paint cache runs before styles/body so the current wallpaper is already selected. -->
+    <script src="js/preload.js"></script>
+    <link rel="stylesheet" href="css/01-base.css">
+    <link rel="stylesheet" href="css/02-desktop.css">
+    <link rel="stylesheet" href="css/03-widgets.css">
+    <link rel="stylesheet" href="css/04-system.css">
+    <link rel="stylesheet" href="css/05-accessibility.css">
+    <link rel="stylesheet" href="css/06-app-windows.css">
+    <link rel="stylesheet" href="css/07-finder.css">
+    <link rel="stylesheet" href="css/08-native-controls.css">
+    <link rel="stylesheet" href="css/09-devtools.css">
+    <link rel="stylesheet" href="css/10-features.css">
+</head>
+<body class="light-mode">
+    <div id="wallpaper"></div>
+    <div id="desktop-widget-layer" class="desktop-widget-layer"></div>
+    <div id="desktop-grid" class="desktop-container"></div>
+    
+    <div id="menu-bar" class="hide-on-launchpad">
+        <div class="menu-left">
+            <span class="apple-logo" id="apple-menu-btn"></span>
+            <div id="system-menu-items" class="menu-app-items">
+                <span class="bold" data-i18n="chrome">Chrome</span>
+                <span data-i18n="file">文件</span><span data-i18n="edit">编辑</span><span data-i18n="view">视图</span><span data-i18n="history">历史记录</span><span data-i18n="bookmarks">书签</span><span data-i18n="window">窗口</span><span data-i18n="help">帮助</span>
+            </div>
+            <div id="plugin-menu-items" class="menu-app-items hidden" aria-live="polite"></div>
+        </div>
+        <div class="menu-right">
+            <span id="status-items" class="status-items"></span>
+            <span id="spotlight-btn" style="cursor:pointer; margin-inline-end:18px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            </span>
+            <span id="clock"></span>
+        </div>
+    </div>
+    
+    <div id="global-select-dropdown" class="dropdown-menu mac-acrylic window-shadow hidden" style="z-index: 99999; padding: 4px;"></div>
+    
+    <div id="apple-dropdown" class="dropdown-menu mac-acrylic window-shadow hidden" style="z-index: 99999;">
+        <div class="menu-item" id="btn-about-mac" data-i18n="aboutMac">关于本机</div>
+        <div class="menu-separator"></div>
+        <div class="menu-item" id="btn-sys-settings" data-i18n="sysSettings">系统偏好设置...</div>
+        <div class="menu-item dev-tools-only" id="btn-devtools" data-i18n="devToolsMenu">开发者工具…</div>
+        <div class="menu-item" data-i18n="appStore">App Store...</div>
+        <div class="menu-separator"></div>
+        <div class="menu-item" data-i18n="sleep">睡眠</div>
+        <div class="menu-item" data-i18n="restart">重新启动...</div>
+        <div class="menu-item" data-i18n="shutdown">关机...</div>
+    </div>
+
+    <div class="dropdown-menu mac-acrylic window-shadow hidden" id="engine-menu" style="width: 150px; z-index: 99999;">
+        <div class="menu-item engine-item" data-engine="google">Google</div>
+        <div class="menu-item engine-item" data-engine="bing">Bing</div>
+        <div class="menu-item engine-item" data-engine="duck">DuckDuckGo</div>
+        <div class="menu-item engine-item" data-engine="chatgpt">ChatGPT</div>
+    </div>
+    
+    <div id="about-window" class="window hidden mac-acrylic window-shadow">
+        <div class="window-controls about-window-controls">
+            <div class="btn close" data-target="about-window"></div>
+            <div class="btn minimize"></div>
+            <div class="btn maximize"></div>
+        </div>
+        <div class="about-content">
+            <div class="about-icon-column">
+                <img class="about-system-image" src="assets/images/Sequoia.png" alt="">
+            </div>
+            <div class="about-info-column">
+                <div class="about-heading">
+                    <h2 id="about-os-name">macOS NewTab</h2>
+                    <p id="about-os-version">版本 15.7.3</p>
+                </div>
+                <div class="about-specs">
+                    <div class="about-label" data-i18n="model">机型</div><div class="about-value" id="about-model">Chromebook Pro</div>
+                    <div class="about-label" data-i18n="chip">芯片</div><div class="about-value" id="about-chip">Intel N200</div>
+                    <div class="about-label" data-i18n="memory">内存</div><div class="about-value" id="about-memory">8 GB</div>
+                    <div class="about-label" data-i18n="disk">启动磁盘</div><div class="about-value" id="about-disk">Macintosh HD</div>
+                </div>
+                <button class="mac-btn about-more-btn" data-i18n="moreInfo">更多信息...</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="spotlight" class="window hidden mac-acrylic window-shadow hide-on-launchpad">
+        <form id="search-form" style="z-index: 25; position: relative;">
+            <div class="engine-dropdown-container">
+                <svg class="search-icon" id="spotlight-engine-trigger" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            </div>
+            <input type="text" name="q" id="search-input" data-i18n="spotlightSearch" placeholder="Spotlight 搜索..." autocomplete="off">
+        </form>
+        <div id="quick-links" class="scrollbar"></div>
+        <div id="spotlight-results" class="spotlight-results scrollbar hidden" role="listbox"></div>
+    </div>
+    
+    <div id="settings-window" class="window hidden window-shadow hide-on-launchpad" style="flex-direction: row; overflow: hidden; background: transparent; border: var(--mac-border-light);">
+        <div class="settings-sidebar mac-acrylic" style="border: none; border-inline-end: var(--mac-border-light); border-start-start-radius: 12px; border-end-start-radius: 12px; box-shadow: none;">
+            <div class="window-controls" style="margin-block: 14px 20px; margin-inline: 14px 0;">
+                <div class="btn close" data-target="settings-window"></div>
+                <div class="btn minimize"></div>
+                <div class="btn maximize"></div>
+            </div>
+            <div class="search-box-sidebar">
+                <input id="settings-search-input" type="search" data-i18n="search" placeholder="搜索" autocomplete="off">
+                <div id="settings-search-results" class="settings-search-results hidden"></div>
+            </div>
+            <div class="settings-tab-list">
+            <div class="tab active" data-target="set-general" data-i18n="tabGeneral">通用</div>
+            <div class="tab" data-target="set-appearance" data-i18n="tabAppearance">外观</div>
+            <div class="tab" data-target="set-accessibility" data-i18n="tabAccessibility">辅助功能</div>
+            <div class="tab" data-target="set-wallpaper" data-i18n="tabWallpaper">墙纸</div>
+            <div class="tab tab-group-start" data-target="set-desktop" data-i18n="tabDesktop">桌面与窗口</div>
+            <div class="tab" data-target="set-dock" data-i18n="tabDock">程序坞</div>
+            <div class="tab" data-target="set-launchpad" data-i18n="tabLaunchpad">启动台</div>
+            <div class="tab" data-target="set-spotlight" data-i18n="tabSpotlight">聚焦搜索</div>
+            <div class="tab tab-group-start" data-extra-feature data-target="set-notifications" data-i18n="tabNotifications">通知</div>
+            <div class="tab" data-extra-feature data-target="set-widgets" data-i18n="tabWidgets">小组件</div>
+            <div class="tab" data-extra-feature data-target="set-applications" data-i18n="tabApplications">应用程序</div>
+            <div class="tab" data-extra-feature data-target="set-screen-time" data-i18n="tabScreenTime">网页时间管理</div>
+            <div class="tab tab-group-start" data-target="set-storage" data-i18n="tabStorage">储存空间</div>
+            <div class="tab" data-target="set-about" data-i18n="tabAbout">关于本机</div>
+            <div class="tab" data-target="set-developer" data-i18n="tabDeveloper">开发者</div>
+            </div>
+        </div>
+        <div class="settings-main" style="border: var(--mac-border-light); border-inline-start: none; border-start-end-radius: 12px; border-end-end-radius: 12px;">
+            <div class="settings-header">
+                <h2 id="settings-title" data-i18n="tabGeneral">通用</h2>
+            </div>
+            <div class="settings-scroll-area scrollbar">
+                
+                <div id="set-general" class="set-panel active">
+                    <h3 data-i18n="languageSet">语言 (Language)</h3>
+                    <div class="mac-card">
+                        <div class="card-row">
+                            <span data-i18n="language">显示语言</span>
+                            <div class="mac-custom-select" id="lang-select" data-options='[{"value":"zh-CN","labelKey":"languageZhCN"},{"value":"en-US","labelKey":"languageEnUS"},{"value":"ja-JP","labelKey":"languageJaJP"}]' data-value="zh-CN">
+                                <span class="selected-text">简体中文</span><span>▾</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 data-i18n="linksTitle">链接</h3>
+                    <div class="mac-card">
+                        <div class="card-row">
+                            <div><div data-i18n="openLinksInNewTab">在新标签页中打开链接</div><div class="developer-setting-note" data-i18n="openLinksInNewTabHint">打开网页链接时保留当前页面，在新的标签页中打开。</div></div>
+                            <label class="mac-switch"><input type="checkbox" id="open-links-new-tab-toggle"><span class="slider"></span></label>
+                        </div>
+                    </div>
+
+                    <h3 data-i18n="backupTitle">备份与恢复</h3>
+                    <div class="mac-card">
+                        <div class="card-row">
+                            <div><div data-i18n="backup">备份设置</div><div class="developer-setting-note" data-i18n="backupHint">把全部设置导出为一个 JSON 文件。应用程序存储的数据和文件不包含在内。</div></div>
+                            <button id="export-btn" class="mac-btn" data-i18n="btnExport">导出 JSON</button>
+                        </div>
+                        <div class="card-row">
+                            <span data-i18n="restoreBackup">恢复备份</span>
+                            <label class="mac-btn"><span data-i18n="importBackup">导入备份</span><input type="file" hidden id="config-upload" accept=".json"></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="set-appearance" class="set-panel">
+                    <div class="mac-card">
+                        <div class="card-row">
+                            <span data-i18n="themeMode">外观设置</span>
+                            <div class="mac-custom-select" id="theme-select" data-options='[{"value":"light","labelKey":"themeLight"},{"value":"dark","labelKey":"themeDark"},{"value":"system","labelKey":"themeSystem"},{"value":"auto","labelKey":"themeAuto"}]' data-value="system">
+                                <span class="selected-text" data-i18n="themeSystem">跟随系统</span><span>▾</span>
+                            </div>
+                        </div>
+                        <div class="card-row">
+                            <div><div data-i18n="accentColor">强调色</div><div class="developer-setting-note" id="accent-color-note"></div></div>
+                            <div id="accent-color-picker" class="accent-picker" role="radiogroup"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="set-accessibility" class="set-panel">
+                    <h3 data-i18n="accessibilityDisplay">显示</h3>
+                    <div class="mac-card">
+                        <div class="card-row"><div><div data-i18n="developerDisableAnimations">关闭系统动画</div><div class="developer-setting-note" data-i18n="developerDisableAnimationsHint">关闭窗口、菜单、小组件和程序坞的过渡与动画。</div></div><label class="mac-switch"><input type="checkbox" id="accessibility-reduce-motion"><span class="slider"></span></label></div>
+                        <div class="card-row"><div><div data-i18n="developerReduceTransparency">降低透明度</div><div class="developer-setting-note" data-i18n="developerReduceTransparencyHint">关闭磨砂玻璃，改用不透明系统表面。</div></div><label class="mac-switch"><input type="checkbox" id="accessibility-reduce-transparency"><span class="slider"></span></label></div>
+                        <div class="card-row"><div><div data-i18n="developerIncreaseContrast">增强对比度</div><div class="developer-setting-note" data-i18n="developerIncreaseContrastHint">提高文字、边框和控件状态的可辨识度。</div></div><label class="mac-switch"><input type="checkbox" id="accessibility-increase-contrast"><span class="slider"></span></label></div>
+                        <div class="card-row"><div><div data-i18n="developerTransparentGlass">使用透明代替磨砂玻璃</div><div class="developer-setting-note" data-i18n="developerTransparentGlassHint">关闭背景模糊但保留透明材质，用于降低 GPU 合成开销。</div></div><label class="mac-switch"><input type="checkbox" id="accessibility-transparent-glass"><span class="slider"></span></label></div>
+                    </div>
+                    <h3 data-i18n="accessibilitySubtitles">字幕</h3>
+                    <div class="mac-card">
+                        <div class="card-row"><span data-i18n="subtitleSize">字号</span>
+                            <div class="mac-custom-select" id="subtitle-size" data-options='[{"value":"small","labelKey":"subtitleSizeSmall"},{"value":"medium","labelKey":"subtitleSizeMedium"},{"value":"large","labelKey":"subtitleSizeLarge"},{"value":"xlarge","labelKey":"subtitleSizeXLarge"}]' data-value="medium"><span class="selected-text" data-i18n="subtitleSizeMedium">中</span><span>▾</span></div>
+                        </div>
+                        <div class="card-row"><span data-i18n="subtitleBackground">底色</span>
+                            <div class="mac-custom-select" id="subtitle-background" data-options='[{"value":"none","labelKey":"subtitleBackgroundNone"},{"value":"translucent","labelKey":"subtitleBackgroundTranslucent"},{"value":"opaque","labelKey":"subtitleBackgroundOpaque"}]' data-value="translucent"><span class="selected-text" data-i18n="subtitleBackgroundTranslucent">半透明</span><span>▾</span></div>
+                        </div>
+                        <div class="card-row"><div><div data-i18n="subtitlePosition">位置</div><div class="developer-setting-note" data-i18n="subtitleHint">用于应用程序播放的视频，例如音乐里带字幕的视频。</div></div>
+                            <div class="mac-custom-select" id="subtitle-position" data-options='[{"value":"bottom","labelKey":"subtitlePositionBottom"},{"value":"top","labelKey":"subtitlePositionTop"},{"value":"custom","labelKey":"subtitlePositionCustom"}]' data-value="bottom"><span class="selected-text" data-i18n="subtitlePositionBottom">底部</span><span>▾</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="set-wallpaper" class="set-panel wallpaper-settings-panel">
+                    <div class="mac-card">
+                        <div class="card-row wallpaper-scope-row">
+                            <div><div data-i18n="wallpaperScope">为哪种外观设置墙纸</div><div class="developer-setting-note" data-i18n="wallpaperScopeHint">先选择外观，再在下方挑选墙纸；之后选的图片只用于这里选中的外观。</div></div>
+                            <div id="wallpaper-scope" class="mac-segmented" role="tablist">
+                                <button type="button" class="selected" data-scope="both" data-i18n="wallpaperScopeBoth">浅色与深色</button>
+                                <button type="button" data-scope="light" data-i18n="wallpaperScopeLight">浅色</button>
+                                <button type="button" data-scope="dark" data-i18n="wallpaperScopeDark">深色</button>
+                            </div>
+                        </div>
+                        <div class="wallpaper-current">
+                            <button type="button" class="wallpaper-preview-item" data-mode="light"><span id="wallpaper-preview-light" class="wallpaper-preview"></span><span data-i18n="wallpaperScopeLight">浅色</span></button>
+                            <button type="button" class="wallpaper-preview-item" data-mode="dark"><span id="wallpaper-preview-dark" class="wallpaper-preview"></span><span data-i18n="wallpaperScopeDark">深色</span></button>
+                            <div class="wallpaper-current-info">
+                                <div id="wallpaper-current-name" class="wallpaper-current-name"></div>
+                                <div id="wallpaper-current-detail" class="developer-setting-note"></div>
+                                <div id="wallpaper-progress-row" class="wallpaper-progress hidden">
+                                    <progress id="wallpaper-progress" max="1" value="0"></progress>
+                                    <span id="wallpaper-progress-label"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-row">
+                            <div><div data-i18n="bingWall">启用 Bing 每日壁纸</div><div class="developer-setting-note" data-i18n="bingWallHint">每天自动更换，用于两种外观。</div></div>
+                            <label class="mac-switch"><input type="checkbox" id="bing-wallpaper-toggle"><span class="slider"></span></label>
+                        </div>
+                        <div class="card-row">
+                            <span data-i18n="restoreWall">恢复默认壁纸</span>
+                            <button id="reset-bg-btn" class="mac-btn" data-i18n="btnRestore">恢复</button>
+                        </div>
+                    </div>
+
+                    <div class="wallpaper-section-head"><h3 data-i18n="liveWallpapers">动态壁纸</h3></div>
+                    <div class="mac-card wallpaper-gallery-card">
+                        <div id="live-wallpaper-controls" class="live-wallpaper-controls" hidden>
+                            <button id="live-wallpaper-toggle" class="mac-btn" type="button">❚❚</button>
+                            <input id="live-wallpaper-seek" type="range" min="0" max="1000" value="0" aria-label="Progress">
+                            <span id="live-wallpaper-time" class="live-wallpaper-time">0:00</span>
+                            <div class="mac-custom-select" id="live-wallpaper-rate" data-options='[{"value":"0.25","label":"0.25×"},{"value":"0.5","label":"0.5×"},{"value":"0.75","label":"0.75×"},{"value":"1","label":"1×"},{"value":"1.25","label":"1.25×"},{"value":"1.5","label":"1.5×"},{"value":"2","label":"2×"}]' data-value="1"><span class="selected-text">1×</span><span>▾</span></div>
+                            <span class="live-wallpaper-volume-icon" aria-hidden="true">🔈</span>
+                            <input id="live-wallpaper-volume" type="range" min="0" max="100" value="0" aria-label="Volume">
+                        </div>
+                        <div id="wallpaper-video-grid" class="wallpaper-grid"></div>
+                        <input id="wallpaper-add-video" type="file" accept="video/*" hidden>
+                        <div class="widget-settings-hint" data-i18n="liveWallpaperHint">选择一个本地视频作为桌面背景循环播放，始终用于两种外观。视频保存在本机，不会上传。</div>
+                    </div>
+
+                    <div class="wallpaper-section-head"><h3 data-i18n="yourPhotos">你的照片</h3></div>
+                    <div class="mac-card wallpaper-gallery-card">
+                        <div id="wallpaper-photo-grid" class="wallpaper-grid"></div>
+                        <input id="wallpaper-add-photo" type="file" accept="image/*" multiple hidden>
+                    </div>
+
+                    <div class="wallpaper-section-head"><h3 data-i18n="bingGalleryTitle">Bing 壁纸</h3></div>
+                    <div class="mac-card bing-gallery-card">
+                        <div class="bing-gallery-toolbar">
+                            <button id="bing-month-prev" class="mac-btn" type="button" aria-label="Previous month">‹</button>
+                            <div class="mac-custom-select" id="bing-year-select" data-options='[]' data-value=""><span class="selected-text"></span><span>▾</span></div>
+                            <div class="mac-custom-select" id="bing-month-select" data-options='[]' data-value=""><span class="selected-text"></span><span>▾</span></div>
+                            <button id="bing-month-next" class="mac-btn" type="button" aria-label="Next month">›</button>
+                            <span id="bing-gallery-status" class="bing-gallery-status"></span>
+                        </div>
+                        <div id="bing-gallery-grid" class="bing-gallery-grid"></div>
+                        <div class="widget-settings-hint" data-i18n="bingGalleryHint">选择月份浏览当月的 Bing 每日壁纸，点按一张即可设为桌面背景。</div>
+                    </div>
+                </div>
+
+                <div id="set-storage" class="set-panel storage-settings-panel">
+                    <div class="mac-card storage-summary-card">
+                        <div class="storage-summary-head"><span data-i18n="storageThisExtension">此扩展在这台电脑上</span><span id="storage-total" class="storage-total"></span></div>
+                        <div id="storage-bar" class="storage-bar"></div>
+                        <div id="storage-legend" class="storage-legend"></div>
+                    </div>
+                    <h3 data-extra-feature data-i18n="storageApps">应用程序</h3>
+                    <div class="mac-card" data-extra-feature>
+                        <div id="storage-app-list"></div>
+                        <div class="widget-settings-hint" data-i18n="storageAppsHint">大小包含应用程序本身和它存储的数据与文件。这里只能整体抹掉一个应用程序的数据；更细的清理由应用程序在自己的设置中提供。</div>
+                    </div>
+                    <h3 data-i18n="tabWallpaper">墙纸</h3>
+                    <div class="mac-card">
+                        <div id="storage-wallpaper-list"></div>
+                        <div class="card-row">
+                            <span data-i18n="storageRemoveUnused">删除未使用的墙纸</span>
+                            <button id="storage-remove-unused" class="mac-btn" type="button" data-i18n="btnDelete">删除</button>
+                        </div>
+                    </div>
+                    <h3 data-i18n="storageSystem">系统数据</h3>
+                    <div class="mac-card">
+                        <div class="card-row">
+                            <div><div data-i18n="storageSystemData">设置与缓存</div><div class="developer-setting-note" data-i18n="storageSystemHint">系统设置、自定义图标、小组件数据和首屏缓存。</div></div>
+                            <span id="storage-system-size" class="storage-row-size"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="set-about" class="set-panel">
+                    <h3 data-i18n="customAbout">自定义关于本机信息</h3>
+                    <div class="mac-card" style="padding: 15px;">
+                        <div class="add-box"><span style="width:70px;font-size:12px;" data-i18n="osName">系统名称</span><input type="text" id="edit-os-name" class="mac-input"></div>
+                        <div class="add-box"><span style="width:70px;font-size:12px;" data-i18n="osVersion">系统版本</span><input type="text" id="edit-os-version" class="mac-input"></div>
+                        <div class="add-box"><span style="width:70px;font-size:12px;" data-i18n="model">机型</span><input type="text" id="edit-model" class="mac-input"></div>
+                        <div class="add-box"><span style="width:70px;font-size:12px;" data-i18n="chip">芯片</span><input type="text" id="edit-chip" class="mac-input"></div>
+                        <div class="add-box"><span style="width:70px;font-size:12px;" data-i18n="memory">内存</span><input type="text" id="edit-memory" class="mac-input"></div>
+                        <div class="add-box"><span style="width:70px;font-size:12px;" data-i18n="disk">启动磁盘</span><input type="text" id="edit-disk" class="mac-input"></div>
+                        <button id="save-about-btn" class="mac-btn blue" style="margin-top:15px; width: 100%;" data-i18n="btnSave">保存修改</button>
+                    </div>
+                </div>
+                
+                <div id="set-desktop" class="set-panel">
+                    <h3 data-i18n="windowsTitle">窗口</h3>
+                    <div class="mac-card">
+                        <div class="card-row">
+                            <div><div data-i18n="windowTiling">拖到屏幕边缘时排列窗口</div><div class="developer-setting-note" data-i18n="windowTilingHint">把窗口拖到左、右边缘占半个桌面，拖到顶部填满桌面；拖离后恢复原来的大小。</div></div>
+                            <label class="mac-switch"><input type="checkbox" id="window-tiling-toggle" checked><span class="slider"></span></label>
+                        </div>
+                        <div class="card-row">
+                            <div><div data-i18n="escCloses">使用 Esc 关闭顶层窗口</div><div class="developer-setting-note" data-i18n="escClosesHint">按 Esc 关闭最前面的窗口。应用程序自己用到 Esc 的地方（关闭面板、取消输入）不受影响。</div></div>
+                            <label class="mac-switch"><input type="checkbox" id="window-escape-toggle" checked><span class="slider"></span></label>
+                        </div>
+                        <div class="card-row">
+                            <div><div data-i18n="missionControl">调度中心</div><div class="developer-setting-note" data-i18n="missionControlHint">平铺所有打开的窗口，点按其中一个切换过去。快捷键 ⌃↑ 或 F3，也在“窗口”菜单里。</div></div>
+                            <button id="open-mission-control" class="mac-btn" type="button" data-i18n="open">打开</button>
+                        </div>
+                    </div>
+                    <h3 data-i18n="desktopItems">桌面项目</h3>
+                    <div class="mac-card">
+                        <div class="card-row">
+                            <span data-i18n="snapToGrid">桌面图标对齐网格</span>
+                            <label class="mac-switch"><input type="checkbox" id="desktop-snap-toggle" checked><span class="slider"></span></label>
+                        </div>
+                    </div>
+                    <div class="mac-card list-card">
+                        <div id="desk-edit-list" class="edit-list scrollbar"></div>
+                        <div class="add-box">
+                            <input type="text" id="new-desk-name" class="mac-input" data-i18n="appName" placeholder="名称" style="width:60px;">
+                            <input type="text" id="new-desk-url" class="mac-input" data-i18n="appUrl" placeholder="网址 (https://...)">
+                            <label style="font-size:11px; display:flex; align-items:center; gap:4px; flex-shrink:0; cursor:pointer;"><input type="checkbox" id="new-desk-bg" checked><span data-i18n="useBg">圆角底板</span></label>
+                            <button id="add-desk-btn" class="mac-btn blue" data-i18n="btnAdd">添加项目</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="set-dock" class="set-panel">
+                    <div class="mac-card dock-controls-card">
+                        <div class="dock-slider-grid">
+                            <div class="dock-slider-group">
+                                <div class="dock-slider-title" data-i18n="dockSize">图标大小</div>
+                                <input type="range" id="dock-size" min="30" max="90" value="56">
+                                <div class="dock-slider-labels"><span data-i18n="small">小</span><span data-i18n="large">大</span></div>
+                            </div>
+                            <div class="dock-slider-group">
+                                <div class="dock-slider-title" data-i18n="dockMagnification">图标放大</div>
+                                <input type="range" id="dock-magnification" min="0" max="100" value="45">
+                                <div class="dock-slider-labels dock-magnification-labels"><span data-i18n="off">关</span><span data-i18n="small">小</span><span data-i18n="large">大</span></div>
+                            </div>
+                        </div>
+                        <div class="card-row">
+                            <span data-i18n="dockSquircle">为外部网页添加圆角底板</span>
+                            <label class="mac-switch"><input type="checkbox" id="dock-icon-bg" checked><span class="slider"></span></label>
+                        </div>
+                        <div class="card-row">
+                            <span data-i18n="darkLightBg">深色模式使用浅色底板</span>
+                            <label class="mac-switch"><input type="checkbox" id="dock-light-bg-dark" checked><span class="slider"></span></label>
+                        </div>
+                        <div class="card-row">
+                            <span data-i18n="dockShowIndicators">为打开的应用程序显示指示灯</span>
+                            <label class="mac-switch"><input type="checkbox" id="dock-show-indicators" checked><span class="slider"></span></label>
+                        </div>
+                    </div>
+                    <div class="mac-card list-card">
+                        <div id="dock-edit-list" class="edit-list scrollbar"></div>
+                        <div class="add-box">
+                            <input type="text" id="new-dock-name" class="mac-input" data-i18n="appName" placeholder="名称" style="width:60px;">
+                            <input type="text" id="new-dock-url" class="mac-input" data-i18n="appUrl" placeholder="网址 (https://...)">
+                            <label style="font-size:11px; display:flex; align-items:center; gap:4px; flex-shrink:0; cursor:pointer;"><input type="checkbox" id="new-dock-bg" checked><span data-i18n="useBg">圆角底板</span></label>
+                            <button id="add-dock-btn" class="mac-btn blue" data-i18n="btnAdd">添加项目</button>
+                        </div>
+                    </div>
+                    <h3 data-i18n="dockFolderLinks">右侧文件夹链接</h3>
+                    <div class="mac-card list-card">
+                        <div id="dock-folder-edit-list" class="edit-list scrollbar"></div>
+                        <div class="add-box">
+                            <input type="text" id="new-folder-name" class="mac-input" data-i18n="appName" placeholder="名称" style="width:90px;">
+                            <input type="text" id="new-folder-url" class="mac-input" data-i18n="appUrl" placeholder="网址 (https://...)">
+                            <button id="add-folder-btn" class="mac-btn blue" data-i18n="btnAdd">添加项目</button>
+                        </div>
+                        <div class="widget-settings-hint" data-i18n="dockFolderHint">这些链接显示在分隔线右侧，并统一使用文件夹图标。</div>
+                    </div>
+                </div>
+                
+                <div id="set-launchpad" class="set-panel">
+                    <div class="mac-card list-card">
+                        <div id="lp-edit-list" class="edit-list scrollbar"></div>
+                        <div class="add-box">
+                            <input type="text" id="new-lp-name" class="mac-input" data-i18n="lpName" placeholder="名称" style="width:60px;">
+                            <input type="text" id="new-lp-url" class="mac-input" data-i18n="lpUrl" placeholder="网址 (https://...)">
+                            <label style="font-size:11px; display:flex; align-items:center; gap:4px; flex-shrink:0; cursor:pointer;"><input type="checkbox" id="new-lp-bg" checked><span data-i18n="useBg">圆角底板</span></label>
+                            <button id="add-lp-btn" class="mac-btn blue" data-i18n="btnAdd">添加项目</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="set-spotlight" class="set-panel">
+                    <h3 data-i18n="searchEngine">默认搜索引擎</h3>
+                    <div class="mac-card">
+                        <div class="card-row">
+                            <span data-i18n="searchEngine">搜索引擎选择</span>
+                            <div class="mac-custom-select" id="engine-select-main" data-options='[{"value":"google","label":"Google"},{"value":"bing","label":"Bing"},{"value":"duck","label":"DuckDuckGo"},{"value":"chatgpt","label":"ChatGPT"}]' data-value="google">
+                                <span class="selected-text">Google</span><span>▾</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h3 data-i18n="spotlightResults">搜索结果</h3>
+                    <div class="mac-card">
+                        <div class="card-row">
+                            <div><div data-i18n="tabApplications">应用程序</div><div class="developer-setting-note" data-i18n="spotlightAppsHint">按名称查找启动台、程序坞和桌面上的项目。</div></div>
+                            <label class="mac-switch"><input type="checkbox" id="spotlight-apps-toggle" checked><span class="slider"></span></label>
+                        </div>
+                        <div class="card-row" data-extra-feature>
+                            <div><div data-i18n="spotlightContent">应用程序中的内容</div><div class="developer-setting-note" data-i18n="spotlightContentHint">查找应用程序提供的内容，例如歌曲和图书，并直接在应用程序中打开。</div></div>
+                            <label class="mac-switch"><input type="checkbox" id="spotlight-content-toggle" checked><span class="slider"></span></label>
+                        </div>
+                    </div>
+
+                    <h3 data-i18n="shortcutSettings">快捷键设置</h3>
+                    <div class="mac-card">
+                        <div class="card-row">
+                            <span data-i18n="triggerSpotlight">唤出 Spotlight</span>
+                            <div style="display:flex; align-items:center; gap: 8px;">
+                                <div class="mac-custom-select" id="shortcut-modifier" data-options='[{"value":"Meta","label":"Cmd/Ctrl"},{"value":"Alt","label":"Alt/Opt"},{"value":"Shift","label":"Shift"}]' data-value="Meta">
+                                    <span class="selected-text">Cmd/Ctrl</span><span>▾</span>
+                                </div>
+                                <span>+</span>
+                                <input type="text" id="shortcut-key" class="mac-input" maxlength="10" style="width:80px; text-align:center;">
+                            </div>
+                        </div>
+                        <div class="card-row">
+                            <span data-i18n="spotlightOnStart">启动时默认展示 Spotlight</span>
+                            <label class="mac-switch"><input type="checkbox" id="spotlight-on-start-toggle"><span class="slider"></span></label>
+                        </div>
+                        <div class="card-row">
+                            <div><div data-i18n="spotlightFocusOnOpen">开启时获取输入焦点</div><div class="developer-setting-note" data-i18n="spotlightFocusOnOpenHint">打开新标签页时直接把键盘输入交给 Spotlight；开启后会同时强制开启启动展示。</div></div>
+                            <label class="mac-switch"><input type="checkbox" id="spotlight-focus-on-open-toggle"><span class="slider"></span></label>
+                        </div>
+                    </div>
+                    
+                    <h3 data-i18n="quickLinksMgmt">启动项管理</h3>
+                    <div class="mac-card list-card">
+                        <div id="sl-edit-list" class="edit-list scrollbar"></div>
+                        <div class="add-box">
+                            <input type="text" id="new-sl-name" class="mac-input" data-i18n="lpName" placeholder="名称" style="width:60px;">
+                            <input type="text" id="new-sl-url" class="mac-input" data-i18n="lpUrl" placeholder="网址 (https://...)">
+                            <label style="font-size:11px; display:flex; align-items:center; gap:4px; flex-shrink:0; cursor:pointer;"><input type="checkbox" id="new-sl-bg" checked><span data-i18n="useBg">圆角底板</span></label>
+                            <button id="add-sl-btn" class="mac-btn blue" data-i18n="btnAdd">添加项目</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="set-notifications" class="set-panel">
+                    <div class="mac-card">
+                        <div class="card-row">
+                            <div><div data-i18n="notificationDnd">勿扰模式</div><div class="developer-setting-note" data-i18n="notificationDndHint">不弹出通知横幅。通知仍会进入通知中心（点按菜单栏的时钟打开）。</div></div>
+                            <label class="mac-switch"><input type="checkbox" id="notifications-dnd-toggle"><span class="slider"></span></label>
+                        </div>
+                        <div class="card-row">
+                            <span data-i18n="notificationClearHistory">清除通知中心里的全部通知</span>
+                            <button id="notifications-clear" class="mac-btn" type="button" data-i18n="clear">清除</button>
+                        </div>
+                    </div>
+                    <h3 data-i18n="notificationApps">应用程序通知</h3>
+                    <div class="mac-card">
+                        <div id="notification-app-list" class="developer-instance-apps"></div>
+                        <div class="widget-settings-hint" data-i18n="notificationAppsHint">关闭后，这个应用程序发出的通知既不显示横幅，也不进入通知中心。</div>
+                    </div>
+                </div>
+
+                <div id="set-widgets" class="set-panel">
+                    <h3 data-i18n="widgetManagement">小组件管理</h3>
+                    <div class="mac-card">
+                        <div class="card-row">
+                            <span data-i18n="openWidgetGallery">打开小组件图库</span>
+                            <button id="open-widget-gallery-settings" class="mac-btn blue" data-i18n="editWidgets">编辑小组件...</button>
+                        </div>
+                    </div>
+
+                    <h3 data-i18n="widgetWeather">天气</h3>
+                    <div class="mac-card widget-settings-card">
+                        <div class="add-box weather-search-box">
+                            <span class="widget-field-label" data-i18n="weatherSearchPlace">搜索地点</span>
+                            <input id="widget-weather-query" class="mac-input" type="text" data-i18n="weatherSearchPlaceholder" placeholder="Singapore / Tokyo / London">
+                            <button id="widget-weather-search" class="mac-btn blue" data-i18n="search">搜索</button>
+                        </div>
+                        <div id="widget-weather-search-results" class="weather-search-results"></div>
+                        <div class="widget-subtitle" data-i18n="savedWeatherLocations">已保存地点</div>
+                        <div id="widget-weather-location-list" class="widget-location-list"></div>
+                        <div class="widget-settings-hint" data-i18n="weatherPerWidgetHint">可保存多个地点，并在“已放置的小组件”中为每个天气小组件分别选择地点。</div>
+                    </div>
+
+                    <h3 data-i18n="widgetPhotos">照片</h3>
+                    <div class="mac-card photo-widget-settings-card">
+                        <div class="card-row">
+                            <span data-i18n="photoTargetWidget">要设置的照片小组件</span>
+                            <select id="widget-photo-target" class="mac-input photo-widget-setting-control"></select>
+                        </div>
+                        <div class="card-row"><span data-i18n="photoSingle">选择单张照片</span><label class="mac-btn photo-widget-setting-control"><span data-i18n="choosePhoto">选择照片</span><input id="widget-photo-file" type="file" accept="image/*" hidden></label></div>
+                        <div class="card-row"><span data-i18n="photoFolder">选择本地文件夹循环播放</span><label class="mac-btn photo-widget-setting-control"><span data-i18n="chooseFolder">选择文件夹</span><input id="widget-photo-folder" type="file" accept="image/*" webkitdirectory multiple hidden></label></div>
+                        <div id="widget-photo-import-progress-row" class="card-row photo-import-progress-row hidden">
+                            <span id="widget-photo-import-progress-label" data-i18n="photoImportPreparing">准备导入照片…</span>
+                            <progress id="widget-photo-import-progress" max="1" value="0"></progress>
+                        </div>
+                        <div class="card-row"><span data-i18n="photoSourceStatus">当前照片</span><span id="widget-photo-status" class="widget-settings-muted"></span></div>
+                        <div class="card-row">
+                            <span data-i18n="photoChangeMode">切换方式</span>
+                            <select id="widget-photo-schedule-mode" class="mac-input photo-widget-setting-control">
+                                <option value="manual" data-i18n="photoManual">不自动切换</option>
+                                <option value="interval" data-i18n="photoTimed">定时</option>
+                                <option value="events" data-i18n="photoEventTriggered">事件触发</option>
+                            </select>
+                        </div>
+                        <div id="widget-photo-interval-controls" class="card-row photo-schedule-row disabled">
+                            <span data-i18n="photoTimedInterval">定时间隔</span>
+                            <div class="photo-interval-controls">
+                                <input id="widget-photo-interval-value" class="mac-input compact-number photo-widget-setting-control" type="number" min="1" max="1440" value="30">
+                                <select id="widget-photo-interval-unit" class="mac-input photo-widget-setting-control">
+                                    <option value="seconds" data-i18n="seconds">秒</option>
+                                    <option value="minutes" data-i18n="minutes">分钟</option>
+                                    <option value="hours" data-i18n="hours">小时</option>
+                                    <option value="days" data-i18n="daily">每天</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="widget-photo-event-controls" class="photo-event-controls disabled">
+                            <div class="widget-subtitle" data-i18n="photoEventTriggers">事件触发条件（可多选）</div>
+                            <label class="mac-checkbox-row"><input id="widget-photo-event-daynight" class="mac-checkbox photo-widget-setting-control" type="checkbox"><span data-i18n="photoEventDayNight">白天/黑夜切换时</span></label>
+                            <label class="mac-checkbox-row"><input id="widget-photo-event-appearance" class="mac-checkbox photo-widget-setting-control" type="checkbox"><span data-i18n="photoEventAppearance">系统主题或桌面壁纸改变时</span></label>
+                            <label class="mac-checkbox-row"><input id="widget-photo-event-newtab" class="mac-checkbox photo-widget-setting-control" type="checkbox"><span data-i18n="photoEventNewTab">打开新标签页时</span></label>
+                        </div>
+                        <div class="widget-settings-hint" data-i18n="photoIndependentHint">每个照片小组件拥有独立的照片源与切换规则；单张照片不会触发定时刷新。</div>
+                    </div>
+
+                    <h3 data-i18n="placedWidgets">已放置的小组件</h3>
+                    <div class="mac-card list-card"><div id="widget-management-list" class="edit-list widget-management-list"></div></div>
+                </div>
+
+                <div id="set-applications" class="set-panel applications-settings-panel">
+                    <h3 data-i18n="applicationsTitle">应用程序</h3>
+                    <div class="mac-card list-card plugin-manager-card">
+                        <div id="application-plugin-list" class="application-plugin-list"></div>
+                        <div class="add-box">
+                            <label class="mac-btn blue"><span data-i18n="installApplication">安装应用程序...</span><input id="application-plugin-import" type="file" accept="application/json,.json" hidden></label>
+                        </div>
+                        <div class="widget-settings-hint" data-i18n="applicationsHint">应用程序插件在隔离的沙盒中运行，只在打开时启动。可声明所需权限，并拥有独立存储与窗口。</div>
+                    </div>
+                </div>
+
+                <div id="set-developer" class="set-panel developer-settings-panel">
+                    <div class="mac-card developer-card">
+                        <div class="card-row">
+                            <div><div data-i18n="developerModeEnable">启用开发者模式</div><div class="developer-setting-note" data-i18n="developerModeHint">本页的其他选项只在开发者模式开启时生效。</div></div>
+                            <label class="mac-switch"><input type="checkbox" id="developer-mode-toggle"><span class="slider"></span></label>
+                        </div>
+                    </div>
+                    <h3 data-i18n="devTools">开发者工具</h3>
+                    <div class="mac-card developer-card">
+                        <div class="card-row"><div><div data-i18n="developerDevTools">启用开发者工具</div><div class="developer-setting-note" data-i18n="developerDevToolsHint">开启后记录应用程序的日志、接口调用和系统内部事件，并可打开开发者工具窗口：从文件夹载入并热重载应用、界面检查器、储存浏览器、条件模拟、系统监视和配置检查器。关闭时不做任何记录。</div></div><label class="mac-switch"><input type="checkbox" id="developer-devtools"><span class="slider"></span></label></div>
+                        <div class="card-row"><span data-i18n="developerOpenDevTools">开发者工具窗口</span><button id="developer-open-devtools" class="mac-btn" type="button" data-i18n="open">打开</button></div>
+                        <div class="card-row">
+                            <div><div data-i18n="developerSlowMotion">慢动作动画</div><div class="developer-setting-note" data-i18n="developerSlowMotionHint">放慢窗口、程序坞和应用程序内的所有动画，便于逐步观察。</div></div>
+                            <div class="mac-custom-select" id="developer-slow-motion" data-options='[{"value":"1","labelKey":"slowMotionOff"},{"value":"2","label":"÷2"},{"value":"4","label":"÷4"},{"value":"10","label":"÷10"}]' data-value="1"><span class="selected-text" data-i18n="slowMotionOff">正常速度</span><span>▾</span></div>
+                        </div>
+                    </div>
+                    <h3 data-extra-feature data-i18n="developerSecurity">应用程序安全性</h3>
+                    <div class="mac-card developer-card" data-extra-feature>
+                        <div class="card-row"><div><div data-i18n="developerDisableStrictPluginSecurity">关闭严格安全性</div><div class="developer-setting-note" data-i18n="developerDisableStrictPluginSecurityHint">打开后，可以在下面为逐个应用程序选择“宽松”：它可使用更大的包、外部资源、更重的 CSS 和更高的配额，但仍运行在独立沙盒中。没有被选中的应用程序保持严格。</div></div><label class="mac-switch"><input type="checkbox" id="developer-disable-strict-plugin-security"><span class="slider"></span></label></div>
+                        <div class="card-row" id="developer-unrestricted-row" hidden><div><div data-i18n="developerUnrestricted">没有限制的应用程序</div><div class="developer-setting-note" data-i18n="developerUnrestrictedHint">允许你在下面逐个选中的应用程序不受权限声明、配额、大小和频率限制的约束。只对选中的应用程序生效。</div></div><label class="mac-switch"><input type="checkbox" id="developer-unrestricted-apps"><span class="slider"></span></label></div>
+                        <div id="developer-security-list" class="developer-instance-apps" hidden></div>
+                    </div>
+                    <h3 data-extra-feature data-i18n="developerInstances">应用程序多开</h3>
+                    <div class="mac-card developer-card" data-extra-feature>
+                        <div class="card-row"><div><div data-i18n="developerMultiInstance">允许应用程序多开</div><div class="developer-setting-note" data-i18n="developerMultiInstanceHint">默认每个应用程序只有一个窗口。打开后，下面选中的应用程序可以通过菜单栏或程序坞图标的右键菜单再开窗口。</div></div><label class="mac-switch"><input type="checkbox" id="developer-multi-instance"><span class="slider"></span></label></div>
+                        <div class="card-row">
+                            <div><div data-i18n="developerInstanceLimit">每个应用程序最多同时打开</div></div>
+                            <div class="mac-custom-select" id="developer-instance-limit" data-options='[{"value":"2","label":"2"},{"value":"3","label":"3"},{"value":"4","label":"4"},{"value":"6","label":"6"},{"value":"8","label":"8"}]' data-value="4"><span class="selected-text">4</span><span>▾</span></div>
+                        </div>
+                        <div id="developer-instance-apps" class="developer-instance-apps"></div>
+                    </div>
+                    <h3 data-i18n="developerTime">时间模拟</h3>
+                    <div class="mac-card developer-card">
+                        <div class="card-row">
+                            <div><div data-i18n="developerTimeSpeed">模拟系统时间速度</div><div class="developer-setting-note" data-i18n="developerTimeSpeedHint">加快时钟，用于测试随时间变化的功能：自动外观、小组件、网页时间限额。</div></div>
+                            <div class="mac-custom-select" id="developer-time-scale" data-options='[{"value":"0.5","label":"×0.5"},{"value":"1","label":"×1"},{"value":"10","label":"×10"},{"value":"60","label":"×60"},{"value":"360","label":"×360"},{"value":"3600","label":"×3600"}]' data-value="1"><span class="selected-text">×1</span><span>▾</span></div>
+                        </div>
+                        <div class="card-row"><span data-i18n="developerVirtualTime">当前模拟时间</span><span id="developer-time-preview" class="developer-time-preview">—</span></div>
+                        <div class="card-row"><span data-i18n="developerResetTime">重置模拟时间</span><button id="developer-reset-time" class="mac-btn" data-i18n="developerResetNow">重置为现在</button></div>
+                        <div class="card-row"><div><div data-i18n="developerSecondsBase">以秒为基准</div><div class="developer-setting-note" data-i18n="developerSecondsBaseHint">需要输入时长的数字默认按秒解释。</div></div><label class="mac-switch"><input type="checkbox" id="developer-seconds-base"><span class="slider"></span></label></div>
+                    </div>
+                    <h3 data-i18n="developerBehavior">界面与行为</h3>
+                    <div class="mac-card developer-card">
+                        <div class="card-row developer-launchpad-layout-row">
+                            <div><div data-i18n="developerLaunchpadLayout">启动台行列</div><div class="developer-setting-note" data-i18n="developerLaunchpadLayoutHint">0 / 自动会根据屏幕大小计算；一次翻页仍只移动一页。</div></div>
+                            <div class="developer-layout-controls">
+                                <div class="mac-custom-select" id="developer-launchpad-rows" data-options='[{"value":"0","labelKey":"auto"},{"value":"2","label":"2"},{"value":"3","label":"3"},{"value":"4","label":"4"},{"value":"5","label":"5"},{"value":"6","label":"6"},{"value":"7","label":"7"},{"value":"8","label":"8"}]' data-value="0"><span class="selected-text">自动</span><span>▾</span></div>
+                                <span>×</span>
+                                <div class="mac-custom-select" id="developer-launchpad-cols" data-options='[{"value":"0","labelKey":"auto"},{"value":"3","label":"3"},{"value":"4","label":"4"},{"value":"5","label":"5"},{"value":"6","label":"6"},{"value":"7","label":"7"},{"value":"8","label":"8"},{"value":"9","label":"9"},{"value":"10","label":"10"}]' data-value="0"><span class="selected-text">自动</span><span>▾</span></div>
+                            </div>
+                        </div>
+                        <div class="card-row"><div><div data-i18n="developerForceRTL">强制从右到左布局</div><div class="developer-setting-note" data-i18n="developerForceRTLHint">不论当前语言，都按从右到左的语言镜像整个界面和应用程序的布局；文字本身的书写方向不变。用于在不懂该语言的情况下检查布局。</div></div><label class="mac-switch"><input type="checkbox" id="developer-force-rtl"><span class="slider"></span></label></div>
+                        <div class="card-row"><div><div data-i18n="developerAllowSystemIcons">允许调整系统图标</div><div class="developer-setting-note" data-i18n="developerAllowSystemIconsHint">允许修改图标、添加底板并将系统项目移入废纸篓。</div></div><label class="mac-switch"><input type="checkbox" id="developer-allow-system-icons"><span class="slider"></span></label></div>
+                        <div class="card-row"><div><div data-i18n="developerSelectableUIText">可选择的 UI 文字</div><div class="developer-setting-note" data-i18n="developerSelectableUITextHint">允许选择和复制界面文字；默认关闭，拖拽控件仍优先执行交互。</div></div><label class="mac-switch"><input type="checkbox" id="developer-selectable-ui-text"><span class="slider"></span></label></div>
+                        <div class="card-row"><div><div data-i18n="developerDisableExtraFeatures">关闭额外功能</div><div class="developer-setting-note" data-i18n="developerDisableExtraFeaturesHint">停用小组件、应用程序和网页时间管理，并移除它们的全部入口；不会删除已有设置或数据。</div></div><label class="mac-switch"><input type="checkbox" id="developer-disable-extra-features"><span class="slider"></span></label></div>
+                        <div class="card-row"><div><div data-i18n="developerIncognito">无痕模式</div><div class="developer-setting-note" data-i18n="developerIncognitoHint">开启后，本标签页之后的设置与小组件媒体更改不会写入持久存储；关闭无痕模式时会恢复开启前的配置。</div></div><label class="mac-switch"><input type="checkbox" id="developer-incognito-mode"><span class="slider"></span></label></div>
+                    </div>
+                </div>
+
+                <div id="set-screen-time" class="set-panel screen-time-settings-panel">
+                    <div class="screen-time-settings-hero">
+                        <div>
+                            <h3 data-i18n="screenTimeActivity">App 与网页活动</h3>
+                            <div id="screen-time-updated" class="screen-time-updated"></div>
+                        </div>
+                        <label class="mac-switch"><input type="checkbox" id="widget-screen-time-toggle" checked><span class="slider"></span></label>
+                    </div>
+                    <div class="mac-card screen-time-manager-card">
+                        <div class="screen-time-manager-head">
+                            <div><div class="screen-time-manager-label" data-i18n="usage">使用时间</div><div id="screen-time-manager-total" class="screen-time-manager-total">0分钟</div></div>
+                            <div id="screen-time-manager-date" class="screen-time-manager-date"></div>
+                        </div>
+                        <div id="screen-time-manager-week" class="screen-time-manager-week"></div>
+                        <div id="screen-time-manager-chart" class="screen-time-manager-chart"></div>
+                        <div class="screen-time-legend">
+                            <span class="legend-productivity" data-i18n="screenTimeProductivity">效率</span>
+                            <span class="legend-entertainment" data-i18n="screenTimeEntertainment">娱乐</span>
+                            <span class="legend-social" data-i18n="screenTimeSocial">社交</span>
+                            <span class="legend-other" data-i18n="screenTimeOther">其它</span>
+                        </div>
+                    </div>
+                    <h3 data-i18n="screenTimeWebsites">网站</h3>
+                    <div class="mac-card screen-time-sites-card">
+                        <div class="screen-time-manager-sites-header"><span data-i18n="screenTimeWebsites">网站</span><span data-i18n="time">时间</span><span data-i18n="limits">限额</span></div>
+                        <div id="screen-time-manager-sites" class="screen-time-manager-sites"></div>
+                    </div>
+                    <h3 data-i18n="dailyLimits">网页日限额</h3>
+                    <div class="mac-card list-card">
+                        <div id="widget-limit-list" class="edit-list widget-limit-list"></div>
+                        <div class="add-box screen-time-limit-add">
+                            <input id="widget-limit-host" class="mac-input" type="text" data-i18n="websiteDomain" placeholder="example.com">
+                            <div class="limit-duration-field"><input id="widget-limit-minutes" class="mac-input compact-number" type="number" min="1" max="1440" value="60"><span id="widget-limit-unit-label" data-i18n="minutesPerDay">分钟/天</span></div>
+                            <button id="widget-limit-add" class="mac-btn blue" data-i18n="addLimit">添加限额</button>
+                        </div>
+                        <div class="widget-settings-hint" data-i18n="limitDelayHint">达到限额后页面会暂停音视频并被遮罩；可无限次延长 5 分钟。</div>
+                    </div>
+                    <h3 data-i18n="limitOverlayTitle">限额遮罩</h3>
+                    <div class="mac-card list-card plugin-manager-card">
+                        <div id="limit-plugin-list" class="edit-list plugin-list"></div>
+                        <div class="add-box">
+                            <label class="mac-btn blue"><span data-i18n="importPlugin">导入插件</span><input id="limit-plugin-import" type="file" accept="application/json,.json" hidden></label>
+                            <button id="limit-plugin-use-builtin" class="mac-btn" type="button" data-i18n="useBuiltInOverlay">使用内置遮罩</button>
+                        </div>
+                        <div class="widget-settings-hint" data-i18n="pluginHint">插件采用声明式 Overlay API，不运行任意脚本；必须实现“延时五分钟”动作。</div>
+                    </div>
+                    <!-- Settings of the built-in overlay; shown only while the built-in overlay is the one in use. -->
+                    <div id="limit-builtin-settings" class="limit-builtin-settings">
+                    <h3 data-i18n="limitOverlayBuiltinSettings">内置遮罩设置</h3>
+                    <div class="mac-card list-card limit-overlay-settings">
+                        <div class="card-row limit-overlay-message-row">
+                            <span data-i18n="limitOverlayMessage">提示文字</span>
+                            <input id="screen-time-overlay-message" class="mac-input" type="text" maxlength="160" data-i18n="limitOverlayMessagePlaceholder" placeholder="写一句提醒自己的话（可选）">
+                        </div>
+                        <div class="card-row">
+                            <span data-i18n="limitOverlayImage">提示图片</span>
+                            <div class="limit-overlay-image-actions">
+                                <label class="mac-btn"><span data-i18n="choosePhoto">选择照片</span><input id="screen-time-overlay-image" type="file" accept="image/*" hidden></label>
+                                <button id="screen-time-overlay-image-clear" class="mac-btn" type="button" data-i18n="removeImage">移除图片</button>
+                            </div>
+                        </div>
+                        <div id="screen-time-overlay-image-status" class="widget-settings-hint"></div>
+                        <div class="card-row limit-overlay-dimensions">
+                            <span data-i18n="limitOverlayImageBounds">图片最大尺寸</span>
+                            <div class="inline-number-pair"><input id="screen-time-overlay-image-width" class="mac-input compact-number" type="number" min="80" max="900" value="320"><span>×</span><input id="screen-time-overlay-image-height" class="mac-input compact-number" type="number" min="60" max="700" value="220"><span>px</span></div>
+                        </div>
+                        <div class="card-row">
+                            <span data-i18n="limitOverlayTextSize">文字字号</span>
+                            <div class="limit-overlay-slider-wrap"><input id="screen-time-overlay-font-size" type="range" min="10" max="64" value="20"><span id="screen-time-overlay-font-size-value">20 px</span></div>
+                        </div>
+                        <div class="card-row">
+                            <span data-i18n="limitOverlayTextColor">文字颜色</span>
+                            <input id="screen-time-overlay-text-color" class="mac-color-input" type="color" value="#1d1d1f">
+                        </div>
+                        <div class="card-row">
+                            <span data-i18n="limitOverlayFont">自定义字体</span>
+                            <div class="limit-overlay-image-actions"><label class="mac-btn"><span data-i18n="chooseFont">上传字体</span><input id="screen-time-overlay-font" type="file" accept=".woff,.woff2,.ttf,.otf,font/woff,font/woff2,font/ttf,font/otf" hidden></label><button id="screen-time-overlay-font-clear" class="mac-btn" type="button" data-i18n="restoreDefault">恢复默认</button></div>
+                        </div>
+                        <div id="screen-time-overlay-font-status" class="widget-settings-hint"></div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="widget-center" class="widget-center hidden">
+        <div id="widget-center-list" class="widget-center-list scrollbar"></div>
+        <div id="widget-center-empty" class="widget-center-empty hidden" data-i18n="noWidgets">没有小组件</div>
+        <button id="widget-edit-btn" class="widget-edit-btn" data-i18n="editWidgets">编辑小组件...</button>
+    </div>
+
+    <div id="widget-gallery" class="widget-gallery hidden">
+        <div class="widget-gallery-shell mac-acrylic window-shadow">
+            <aside class="widget-gallery-sidebar">
+                <div class="widget-gallery-search-wrap"><input id="widget-gallery-search" type="search" data-i18n="searchWidgets" placeholder="搜索小组件"></div>
+                <button class="widget-gallery-category active" data-category="all" data-i18n="allWidgets">所有小组件</button>
+                <button class="widget-gallery-category" data-category="clock" data-i18n="widgetClock">时钟</button>
+                <button class="widget-gallery-category" data-category="photo" data-i18n="widgetPhotos">照片</button>
+                <button class="widget-gallery-category" data-category="calendar" data-i18n="widgetCalendar">日历</button>
+                <button class="widget-gallery-category" data-category="battery" data-i18n="widgetBattery">电源</button>
+                <button class="widget-gallery-category" data-category="weather" data-i18n="widgetWeather">天气</button>
+                <button class="widget-gallery-category" data-category="screenTime" data-i18n="widgetScreenTime">屏幕使用时间</button>
+            </aside>
+            <main class="widget-gallery-main">
+                <div class="widget-gallery-title" data-i18n="widgetGallery">小组件图库</div>
+                <div id="widget-gallery-grid" class="widget-gallery-grid scrollbar"></div>
+                <div class="widget-gallery-hint" data-i18n="widgetDragHint">将小组件拖到桌面或右侧小组件中心。</div>
+                <button id="widget-gallery-done" class="mac-btn blue widget-gallery-done" data-i18n="done">完成</button>
+            </main>
+        </div>
+    </div>
+
+    <div id="desktop-context-menu" class="widget-context-menu desktop-context-menu mac-acrylic window-shadow hidden" role="menu"></div>
+    <div id="widget-context-menu" class="widget-context-menu mac-acrylic window-shadow hidden" role="menu"></div>
+    <div id="trash-context-menu" class="widget-context-menu trash-context-menu mac-acrylic window-shadow hidden" role="menu"></div>
+
+    <div id="widget-quick-editor" class="widget-quick-editor hidden">
+        <div class="widget-quick-editor-card mac-acrylic window-shadow">
+            <div class="widget-quick-editor-title" id="widget-quick-editor-title"></div>
+            <div id="widget-quick-editor-fields" class="widget-quick-editor-fields"></div>
+            <div class="widget-quick-editor-actions">
+                <button id="widget-quick-editor-cancel" class="mac-btn" data-i18n="cancel">取消</button>
+                <button id="widget-quick-editor-save" class="mac-btn blue" data-i18n="confirm">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="launchpad-delete-dialog" class="launchpad-delete-dialog hidden">
+        <div class="launchpad-delete-card mac-acrylic window-shadow">
+            <div id="launchpad-delete-icon" class="launchpad-delete-icon"></div>
+            <div id="launchpad-delete-message" class="launchpad-delete-message"></div>
+            <div class="launchpad-delete-actions">
+                <button id="launchpad-delete-cancel" class="mac-btn" data-i18n="cancel">取消</button>
+                <button id="launchpad-delete-confirm" class="mac-btn blue" data-i18n="btnDelete">删除</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="trash-window" class="window hidden trash-finder-window window-shadow">
+        <aside class="trash-finder-sidebar mac-acrylic">
+            <div class="window-controls trash-window-controls">
+                <div class="btn close" data-target="trash-window"></div>
+                <div class="btn minimize"></div>
+                <div class="btn maximize"></div>
+            </div>
+            <div class="finder-side-section-label" data-i18n="favorites">个人收藏</div>
+            <div id="finder-sidebar" class="finder-sidebar-list"></div>
+        </aside>
+        <main class="trash-finder-main">
+            <div class="trash-finder-toolbar">
+                <div class="finder-nav">
+                    <button id="finder-back" class="finder-tool-btn" type="button" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14.5 5-7 7 7 7"/></svg></button>
+                    <button id="finder-forward" class="finder-tool-btn" type="button" aria-label="Forward"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9.5 5 7 7-7 7"/></svg></button>
+                </div>
+                <strong id="finder-title" class="finder-title"></strong>
+                <div class="trash-toolbar-spacer"></div>
+                <div class="finder-view-switch" role="group">
+                    <button id="finder-view-icons" class="finder-tool-btn" type="button" aria-label="Icons"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="7" height="7" rx="1.6"/><rect x="13" y="4" width="7" height="7" rx="1.6"/><rect x="4" y="13" width="7" height="7" rx="1.6"/><rect x="13" y="13" width="7" height="7" rx="1.6"/></svg></button>
+                    <button id="finder-view-list" class="finder-tool-btn" type="button" aria-label="List"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M8.5 6.5H20M8.5 12H20M8.5 17.5H20"/><path d="M4.2 6.5h.1M4.2 12h.1M4.2 17.5h.1" stroke-width="2.8"/></svg></button>
+                </div>
+                <button id="trash-restore-btn" class="mac-btn" data-i18n="restoreToOriginal">放回原处</button>
+                <button id="trash-empty-btn" class="mac-btn" data-i18n="emptyTrash">清倒</button>
+                <label class="finder-search">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
+                    <input id="finder-search" type="search" data-i18n="search" placeholder="搜索" autocomplete="off" spellcheck="false">
+                </label>
+            </div>
+            <div id="trash-finder-grid" class="trash-finder-grid scrollbar"></div>
+            <div id="finder-pathbar" class="finder-pathbar"></div>
+            <div class="trash-finder-statusbar"><span id="trash-finder-status"></span></div>
+        </main>
+    </div>
+
+    <div id="launchpad" class="hidden">
+        <div id="launchpad-wallpaper-layer" class="launchpad-wallpaper-layer" aria-hidden="true"></div>
+        <div class="launchpad-dim-layer" aria-hidden="true"></div>
+        <label class="launchpad-search-wrap" for="launchpad-search">
+            <svg class="launchpad-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><line x1="20" y1="20" x2="16.4" y2="16.4"></line></svg>
+            <input id="launchpad-search" type="search" data-i18n="search" placeholder="搜索" autocomplete="off" spellcheck="false">
+        </label>
+        <div id="launchpad-grid" class="scrollbar"></div>
+        <div class="launchpad-dots" id="lp-dots"></div>
+    </div>
+    
+    <div id="dock-container">
+        <div id="dock-shell">
+            <div id="dock-plate" class="mac-acrylic window-shadow"></div>
+            <div id="dock" class="magnify"></div>
+        </div>
+    </div>
+    
+    <script src="js/boot-ui.js"></script>
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>

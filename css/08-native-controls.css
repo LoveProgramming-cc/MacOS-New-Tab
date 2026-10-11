@@ -1,0 +1,256 @@
+/* Native controls drawn with the system vocabulary; wallpaper and storage settings pages.
+   The stylesheets are loaded in the order of their numbers; later files refine earlier ones. */
+/* ------------------------------------------------------------------------------
+   Native applications share the system's control vocabulary.
+   The same radii, borders, fills, type and selection colour as System Settings and
+   Finder, so a native window is indistinguishable from a system one unless its author
+   deliberately styles it otherwise.
+   ------------------------------------------------------------------------------ */
+.plugin-app-window { border-radius: var(--plugin-window-radius, 12px); }
+.plugin-native-app-frame {
+    font-family: inherit;
+    --native-accent: var(--app-accent, var(--accent));
+    --native-accent-rgb: var(--app-accent-rgb, var(--accent-rgb));
+    --native-border: rgba(128,128,128,.3);
+    --native-hairline: rgba(128,128,128,.2);
+    --native-control-bg: var(--input-bg);
+    --native-pane-border: var(--mac-border-light);
+}
+/* A window that pins its appearance pins the system surface tokens with it. */
+.plugin-app-window.plugin-app-force-dark { --card-bg:#2c2c2e; --input-bg:#1c1c1e; --hover-bg:rgba(255,255,255,.1); --mac-border:1px solid rgba(255,255,255,.15); --mac-border-light:.5px solid rgba(255,255,255,.15); }
+.plugin-app-window.plugin-app-force-light { --card-bg:#fff; --input-bg:#fff; --hover-bg:rgba(0,0,0,.05); --mac-border:1px solid rgba(0,0,0,.1); --mac-border-light:.5px solid rgba(255,255,255,.5); }
+
+.plugin-native-button { min-height: 26px; padding: 4px 14px; border-radius: 6px; border: 1px solid var(--native-border); background: var(--native-control-bg); font-family: inherit; font-size: 12px; font-weight: 500; line-height: 1.3; box-shadow: 0 1px 2px rgba(0,0,0,.02); white-space: nowrap; }
+.plugin-native-button:hover { background: var(--native-control-bg); filter: brightness(.97); }
+.plugin-native-button:active { filter: brightness(.85); }
+.plugin-native-button.primary { background: var(--native-accent); border-color: transparent; color: #fff; }
+.plugin-native-button.primary:hover { background: var(--native-accent); }
+.plugin-native-button.danger:hover { background: var(--native-red); }
+.plugin-native-button.plain, .plugin-native-button.plain:hover { box-shadow: none; }
+.plugin-native-button.plain { background: transparent; border-color: transparent; }
+.plugin-native-button.plain:hover { background: var(--hover-bg); filter: none; }
+.plugin-native-button.tinted { color: var(--native-accent); background: rgba(var(--native-accent-rgb), .16); border-color: transparent; box-shadow: none; }
+.plugin-native-button.tinted:hover { background: rgba(var(--native-accent-rgb), .22); filter: none; }
+.plugin-native-button.circle { box-shadow: none; }
+.plugin-native-input, .plugin-native-select { min-height: 28px; padding: 5px 10px; border-radius: 6px; border: 1px solid var(--native-border); background: var(--native-control-bg); font-family: inherit; font-size: 12px; line-height: 1.35; }
+.plugin-native-input:focus, .plugin-native-select:focus { border-color: var(--native-accent); box-shadow: 0 0 0 3px rgba(var(--native-accent-rgb), .2); }
+.plugin-native-input[type="search"] { border-radius: 6px; }
+/* The system switch: 36 × 20, green when on. */
+.plugin-native-switch > span:not(.plugin-native-control-label) { width: 36px; height: 20px; flex: 0 0 36px; box-sizing: border-box; border-radius: 20px; background: var(--hover-bg); border: 1px solid var(--native-border); transition: background .3s; }
+.plugin-native-switch > span:not(.plugin-native-control-label)::after { width: 16px; height: 16px; left: 1px; top: 1px; background: var(--text-main); box-shadow: 0 2px 4px rgba(0,0,0,.2); transition: transform .3s, background .3s; }
+.plugin-native-switch > input:checked + span:not(.plugin-native-control-label) { background: #34c759; border-color: transparent; }
+.plugin-native-switch > input:checked + span:not(.plugin-native-control-label)::after { transform: translateX(16px); background: #fff; }
+.plugin-native-checkbox > input { border-radius: 4px; border: 1px solid var(--native-border); background: var(--native-control-bg); }
+.plugin-native-checkbox > input:checked { background: var(--native-accent); border-color: var(--native-accent); }
+.plugin-native-card { padding: 12px 16px; border-radius: 8px; background: var(--card-bg); border: 1px solid var(--native-hairline); box-shadow: 0 1px 2px rgba(0,0,0,.05); }
+.plugin-native-segmented { border-radius: 7px; background: rgba(128,128,132,.12); }
+.plugin-native-segmented > button { border-radius: 5px; font-family: inherit; font-size: 12px; line-height: 1.3; }
+.plugin-native-textarea, .plugin-native-checkbox, .plugin-native-control-label { font-family: inherit; }
+.plugin-native-segmented > button.active { background: var(--card-bg); box-shadow: 0 1px 3px rgba(0,0,0,.16); }
+/* On dark surfaces the card colour is the surface colour: the chosen segment is lifted instead. */
+.plugin-app-window.plugin-app-force-dark .plugin-native-segmented > button.active,
+body.dark-mode .plugin-app-window:not(.plugin-app-force-light) .plugin-native-segmented > button.active { background: rgba(255,255,255,.2); }
+.plugin-native-list, .plugin-native-table { border: 1px solid var(--native-hairline); border-radius: 8px; }
+.plugin-native-list.plain .plugin-native-list-row, .plugin-native-list-row.drop-hover, .plugin-native-table-row.drop-hover { border-radius: 6px; }
+.plugin-native-list-row:hover, .plugin-native-table-row:hover { background: var(--hover-bg); }
+.plugin-native-list-row.selected, .plugin-native-table-row.selected, .plugin-native-list-row.selected:hover, .plugin-native-table-row.selected:hover { background: var(--native-accent); color: #fff; }
+.plugin-native-list-title { font-weight: 500; }
+.plugin-native-progress { height: 6px; }
+.plugin-native-progress:not([value]) { background: linear-gradient(90deg, rgba(127,127,127,.2) 0 30%, var(--native-accent) 30% 60%, rgba(127,127,127,.2) 60%) 0 0 / 300% 100%; animation: native-progress-indeterminate 1.2s linear infinite; }
+.plugin-native-progress:not([value])::-webkit-progress-bar { background: transparent; }
+@keyframes native-progress-indeterminate { from { background-position: 100% 0; } to { background-position: 0 0; } }
+.plugin-context-item:hover:not(:disabled) { background: var(--accent); }
+
+/* split: the SwiftUI NavigationSplitView arrangement. The first pane is a sidebar that
+   lets the window material show through; the others are the opaque content background.
+   `material` on any container overrides the default: glass | sidebar | content | clear. */
+.plugin-native-split { display: flex; flex-direction: row; align-items: stretch; min-width: 0; min-height: 0; box-sizing: border-box; }
+.plugin-native-split > * { min-height: 0; box-sizing: border-box; }
+.plugin-native-split > :first-child { flex: 0 0 auto; background: transparent; border-inline-end: var(--native-pane-border); }
+.plugin-native-split > :nth-child(n+2) { flex: 1 1 0; min-width: 0; background: var(--solid-bg); }
+.plugin-native-split > :nth-child(n+3) { flex: 0 0 auto; border-inline-start: var(--mac-border); }
+.plugin-native-app-frame .plugin-native-material-content { background: var(--solid-bg); }
+.plugin-native-app-frame .plugin-native-material-sidebar, .plugin-native-app-frame .plugin-native-material-clear { background: transparent; }
+/* Layers of a zstack are separate stacking contexts, painted in order: a later layer is
+   always above an earlier one, whatever positioned content the earlier one holds. */
+.plugin-native-zstack > * { isolation: isolate; }
+
+/* Floating glass inside a window. Where the blur is switched off (Reduce Transparency,
+   transparent glass) it would sit on moving content unblurred, so it becomes an opaque
+   raised surface instead. */
+.plugin-native-glass { border: 1px solid var(--native-hairline); }
+body.dev-reduce-transparency .plugin-native-glass,
+body.dev-transparent-glass .plugin-native-glass { background: var(--card-bg) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+
+/* window.titlebar = "hidden": no title strip. The traffic lights float over the top-left
+   corner and the content runs the full height, like System Settings and Finder. */
+.plugin-app-window.plugin-app-titlebar-hidden .plugin-app-titlebar { position: absolute; top: 0; left: 0; z-index: 4; width: auto; height: 40px; flex: none; display: flex; padding: 0 14px; background: transparent !important; border: 0; pointer-events: none; }
+.plugin-app-window.plugin-app-titlebar-hidden .plugin-app-titlebar > :not(.plugin-app-controls) { display: none; }
+.plugin-app-window.plugin-app-titlebar-hidden .plugin-app-controls { pointer-events: auto; }
+.plugin-app-window.plugin-app-titlebar-hidden .plugin-app-loading-view,
+.plugin-app-window.plugin-app-titlebar-hidden .plugin-app-crash-view { inset: 0; }
+/* Room for the traffic lights at the top of the first pane. */
+.plugin-app-window.plugin-app-titlebar-hidden .plugin-native-split > :first-child::before { content: ""; display: block; flex: 0 0 26px; height: 26px; }
+
+/* Appearance: accent colour swatches. The chosen one carries a white dot, as in macOS. */
+.accent-picker { display: flex; align-items: center; gap: 9px; flex: 0 0 auto; }
+.accent-swatch { position: relative; width: 16px; height: 16px; padding: 0; border: 0; border-radius: 50%; cursor: pointer; box-shadow: inset 0 0 0 .5px rgba(0,0,0,.28), 0 1px 1px rgba(0,0,0,.08); }
+.accent-swatch[data-accent="multicolor"] { background: conic-gradient(from 210deg, #ff5257, #f7821b, #f5b60a, #62ba46, #0a84ff, #a550a7, #f74f9e, #ff5257); }
+.accent-swatch.selected::after { content: ""; position: absolute; inset: 5px; border-radius: 50%; background: #fff; box-shadow: 0 0 1.5px rgba(0,0,0,.45); }
+.accent-swatch:focus-visible { outline: 2px solid rgba(var(--accent-rgb), .6); outline-offset: 2px; }
+
+/* Wallpaper: current picture, download progress, and the Bing month browser. */
+.wallpaper-current { display: flex; align-items: center; gap: 14px; padding: 14px 0 12px; border-bottom: 1px solid rgba(128,128,128,.1); }
+.wallpaper-preview { flex: 0 0 132px; height: 82px; border-radius: 8px; background: rgba(128,128,132,.18) center / cover no-repeat; box-shadow: 0 1px 4px rgba(0,0,0,.18), inset 0 0 0 .5px rgba(0,0,0,.2); }
+.wallpaper-current-info { min-width: 0; flex: 1 1 auto; }
+.wallpaper-current-name { font-size: 14px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wallpaper-progress { display: flex; align-items: center; gap: 10px; margin-top: 8px; font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+.wallpaper-progress.hidden { display: none; }
+.wallpaper-progress progress, .photo-import-progress-row progress { flex: 1 1 auto; min-width: 60px; max-width: 220px; height: 6px; appearance: none; -webkit-appearance: none; border: 0; border-radius: 999px; overflow: hidden; background: rgba(128,128,132,.22); }
+.wallpaper-progress progress::-webkit-progress-bar { background: rgba(128,128,132,.22); }
+.wallpaper-progress progress::-webkit-progress-value { background: var(--accent); transition: width .12s linear; }
+.wallpaper-progress progress:not([value]) { background: linear-gradient(90deg, rgba(128,128,132,.22) 0 30%, var(--accent) 30% 60%, rgba(128,128,132,.22) 60%) 0 0 / 300% 100%; animation: native-progress-indeterminate 1.2s linear infinite; }
+.bing-gallery-card { padding-bottom: 6px; }
+.bing-gallery-toolbar { display: flex; align-items: center; gap: 8px; padding: 12px 0 10px; }
+.bing-gallery-toolbar .mac-btn { padding: 4px 10px; font-size: 14px; line-height: 1; }
+.bing-gallery-toolbar .mac-btn:disabled { opacity: .4; cursor: default; }
+.bing-gallery-toolbar .mac-custom-select { min-width: 86px; }
+.bing-gallery-status { margin-inline-start: auto; font-size: 11px; color: var(--text-muted); }
+.bing-gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px 10px; min-height: 96px; max-height: 330px; overflow-y: auto; padding: 3px; margin: 0 -3px; }
+.bing-gallery-item { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 0; border: 0; background: transparent; color: var(--text-muted); font-size: 11px; cursor: pointer; }
+.bing-gallery-item img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 7px; background: rgba(128,128,132,.18); box-shadow: inset 0 0 0 .5px rgba(0,0,0,.2); outline: 3px solid transparent; outline-offset: 1px; transition: outline-color .12s; }
+.bing-gallery-item:hover img { outline-color: rgba(128,128,132,.4); }
+.bing-gallery-item.selected img { outline-color: var(--accent); }
+.bing-gallery-item.selected { color: var(--text-main); font-weight: 600; }
+.bing-gallery-empty { grid-column: 1 / -1; align-self: center; padding: 26px 0; text-align: center; font-size: 12px; color: var(--text-muted); }
+.plugin-native-list-icon.tinted { display: inline-block; border-radius: 0; background: var(--native-accent); }
+.plugin-native-list-row.selected .plugin-native-list-icon.tinted { background: #fff; }
+
+/* A closed Launchpad is taken out of rendering once it has faded: its full-screen blurred
+   wallpaper layer is not kept composited behind an invisible surface. */
+#launchpad:not(.active) { visibility: hidden; transition: opacity .3s cubic-bezier(.2,.8,.2,1), transform .3s cubic-bezier(.2,.8,.2,1), visibility 0s linear .3s; }
+#launchpad.active { visibility: visible; }
+.launchpad-wallpaper-layer { will-change: auto; }
+
+/* System windows follow the same resize rules they declare to the window manager:
+   Settings grows only taller, Finder resizes freely, About is fixed. */
+#settings-window { resize: vertical; min-height: 360px; max-height: calc(100vh - 34px); }
+#trash-window { resize: both; min-height: 320px; max-width: 100vw; max-height: calc(100vh - 34px); }
+.plugin-app-resizable { max-width: 100vw; max-height: calc(100vh - 30px); }
+/* Circular buttons keep the size they were given. */
+.plugin-native-button.circle { min-height: 0; min-width: 0; flex-shrink: 0; }
+
+/* Wallpaper settings page and live wallpaper. */
+#wallpaper-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+.wallpaper-settings-panel .wallpaper-section-head h3 { margin-block: 5px 0; margin-inline: 5px 0; }
+.wallpaper-gallery-card { padding-top: 12px; padding-bottom: 10px; }
+.wallpaper-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 12px 10px; padding: 3px; margin: 0 -3px; }
+.wallpaper-tile { position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 11px; color: var(--text-muted); cursor: pointer; min-width: 0; }
+.wallpaper-tile img, .wallpaper-tile-add .wallpaper-tile-plus { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 7px; background: rgba(128,128,132,.16); box-shadow: inset 0 0 0 .5px rgba(0,0,0,.2); outline: 3px solid transparent; outline-offset: 1px; transition: outline-color .12s; }
+.wallpaper-tile-add .wallpaper-tile-plus { display: grid; place-items: center; font-size: 26px; font-weight: 300; color: var(--text-muted); }
+.wallpaper-tile:hover img, .wallpaper-tile-add:hover .wallpaper-tile-plus { outline-color: rgba(128,128,132,.4); }
+.wallpaper-tile.selected img { outline-color: var(--accent); }
+.wallpaper-tile.selected { color: var(--text-main); font-weight: 600; }
+.wallpaper-tile-name { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wallpaper-tile-badge { position: absolute; left: 6px; top: 6px; padding: 1px 6px; border-radius: 999px; background: rgba(0,0,0,.55); color: #fff; font-size: 10px; font-weight: 600; }
+.wallpaper-tile-remove { position: absolute; top: 4px; right: 4px; width: 18px; height: 18px; padding: 0; border: 0; border-radius: 50%; background: rgba(0,0,0,.6); color: #fff; font-size: 13px; line-height: 17px; cursor: pointer; opacity: 0; transition: opacity .12s; }
+.wallpaper-tile:hover .wallpaper-tile-remove { opacity: 1; }
+.live-wallpaper-controls { display: flex; align-items: center; gap: 10px; padding: 0 0 12px; margin-bottom: 12px; border-bottom: 1px solid rgba(128,128,128,.12); font-size: 11px; color: var(--text-muted); }
+.live-wallpaper-controls[hidden] { display: none; }
+.live-wallpaper-controls .mac-btn { min-width: 34px; padding: 4px 8px; }
+.live-wallpaper-controls #live-wallpaper-seek { flex: 1 1 auto; min-width: 80px; accent-color: var(--accent); }
+.live-wallpaper-controls #live-wallpaper-volume { width: 80px; accent-color: var(--accent); }
+.live-wallpaper-controls .mac-custom-select { min-width: 70px; }
+.live-wallpaper-time { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.wallpaper-preview { position: relative; overflow: hidden; }
+/* Finder sidebar: pinned web pages. */
+.finder-sidebar-list .finder-side-section-label { margin-top: 14px; }
+.finder-side-favicon { display: inline-grid; place-items: center; }
+.finder-side-favicon .app-icon-container { width: 17px !important; height: 17px !important; }
+.finder-side-favicon .app-icon-container img { width: 100% !important; height: 100% !important; border-radius: 3px; filter: none; }
+.finder-side-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.finder-side-add { color: var(--text-muted); }
+.finder-side-plus { display: inline-grid; place-items: center; font-size: 15px; line-height: 1; }
+
+/* Native UI: hover affordances and the media player surface. */
+.plugin-native-hover-reveal { opacity: 0; transition: opacity .14s ease; }
+.plugin-native-app-frame *:hover > .plugin-native-hover-reveal, .plugin-native-hover-reveal:focus-within { opacity: 1; }
+.plugin-media-park { position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0; pointer-events: none; }
+.plugin-native-video { position: relative; min-width: 0; min-height: 0; overflow: hidden; background: #000; }
+.plugin-native-video > video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: var(--native-video-fit, contain); }
+.finder-sidebar-list { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+
+/* Sidebars scroll when their content no longer fits (a short window, a long list of
+   pages): System Settings' own, and the first pane of any native `split`. Parts that can
+   give way — lists, which scroll by themselves — still shrink first. */
+.settings-tab-list { flex: 1 1 0; min-height: 0; overflow-x: hidden; overflow-y: auto; padding-bottom: 8px; position: relative; z-index: 15; }
+.settings-tab-list::-webkit-scrollbar, .plugin-native-split > :first-child::-webkit-scrollbar { width: 6px; background: transparent; }
+.settings-tab-list::-webkit-scrollbar-thumb, .plugin-native-split > :first-child::-webkit-scrollbar-thumb { background: rgba(128,128,128,.32); border-radius: 4px; }
+.settings-tab-list::-webkit-scrollbar-thumb:hover, .plugin-native-split > :first-child::-webkit-scrollbar-thumb:hover { background: rgba(128,128,128,.5); }
+.settings-sidebar .window-controls, .settings-sidebar .search-box-sidebar { flex: 0 0 auto; }
+.plugin-native-split > :first-child { overflow-x: hidden; overflow-y: auto; }
+
+/* Transitions between layers are run by the host (plugin-native-ui.js). A layer on its
+   way in or out may travel outside its zstack, which therefore clips. */
+.plugin-native-zstack { overflow: clip; }
+.plugin-native-leaving { pointer-events: none !important; }
+
+/* Wallpaper: choose the appearance first, then the picture. Both appearances are shown;
+   the ones the next choice applies to carry the accent ring. */
+.mac-segmented { display: inline-flex; flex: 0 0 auto; padding: 2px; border-radius: 7px; background: rgba(128,128,132,.18); }
+.mac-segmented button { border: 0; background: transparent; color: var(--text-main); font: inherit; font-size: 12px; padding: 3px 12px; border-radius: 5px; cursor: pointer; white-space: nowrap; }
+.mac-segmented button.selected { background: var(--card-bg, #fff); box-shadow: 0 1px 2px rgba(0,0,0,.18), 0 0 0 .5px rgba(0,0,0,.08); font-weight: 600; }
+body.dark-mode .mac-segmented button.selected { background: rgba(120,120,128,.55); }
+.wallpaper-scope-row { gap: 14px; }
+.wallpaper-current { gap: 12px; }
+.wallpaper-preview-item { display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 0; border: 0; background: transparent; color: var(--text-muted); font: inherit; font-size: 11px; cursor: pointer; flex: 0 0 auto; }
+.wallpaper-preview-item .wallpaper-preview { display: block; width: 112px; height: 70px; flex: none; outline: 3px solid transparent; outline-offset: 1px; transition: outline-color .12s; }
+.wallpaper-preview-item.in-scope .wallpaper-preview { outline-color: var(--accent); }
+.wallpaper-preview-item.in-scope { color: var(--text-main); font-weight: 600; }
+
+/* Developer: per-application instance settings. */
+.developer-instance-row { gap: 12px; }
+.developer-instance-app { display: flex; align-items: center; gap: 9px; min-width: 0; flex: 1 1 auto; }
+.developer-instance-app > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.developer-instance-controls { display: flex; align-items: center; gap: 16px; flex: 0 0 auto; }
+.developer-instance-option { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+.developer-instance-off .developer-instance-controls { opacity: .45; }
+.developer-instance-option:has(input:disabled) { opacity: .45; }
+
+/* A Dock icon's menu opens above the Dock and above everything else; the name label
+   steps aside while it is open. */
+.plugin-context-menu-above { z-index: 1000002; }
+body.dock-menu-open .dock-item::after { opacity: 0 !important; transition: none; }
+
+/* System Settings ▸ Storage. */
+.storage-summary-card { padding-top: 14px; padding-bottom: 14px; }
+.storage-summary-head { display: flex; justify-content: space-between; align-items: baseline; font-size: 13px; font-weight: 600; }
+.storage-total { font-weight: 400; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.storage-bar { display: flex; gap: 1px; height: 18px; margin: 10px 0 9px; border-radius: 5px; overflow: hidden; background: rgba(128,128,132,.2); box-shadow: inset 0 0 0 .5px rgba(0,0,0,.12); }
+.storage-bar > span { min-width: 3px; }
+.storage-legend { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 11px; color: var(--text-muted); }
+.storage-legend-item { display: inline-flex; align-items: center; gap: 6px; white-space: pre; }
+.storage-legend-item i { width: 8px; height: 8px; border-radius: 50%; }
+.storage-row { gap: 12px; }
+.storage-row-icon { flex: 0 0 32px; width: 32px; height: 32px; display: grid; place-items: center; }
+.storage-row-icon img { width: 100%; height: 100%; object-fit: contain; }
+.storage-row-thumb { flex-basis: 48px; width: 48px; height: 30px; }
+.storage-row-thumb img { object-fit: cover; border-radius: 4px; box-shadow: inset 0 0 0 .5px rgba(0,0,0,.2); }
+.storage-row-info { flex: 1 1 auto; min-width: 0; }
+.storage-row-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.storage-row-size { flex: 0 0 auto; color: var(--text-muted); font-size: 12px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.storage-row .mac-btn:disabled { opacity: .4; cursor: default; }
+
+/* A segmented control is as wide as its segments and sits in the middle of the room it is
+   given, as in AppKit. Given a width (`width: "fill"`), the segments share it equally. */
+.plugin-native-segmented { display: flex; width: fit-content; max-width: 100%; align-self: center; box-sizing: border-box; }
+.plugin-native-segmented > button { flex: 1 1 0; min-width: max-content; white-space: nowrap; }
+
+/* The content of a native window is clipped to the window's corners by shape, not only by
+   the window's overflow: layers the compositor promotes (frames, running transitions)
+   can otherwise paint over the rounded corners. */
+/* Rounded overflow clipping, not clip-path: a clip-path would make the frame the backdrop
+   root of everything in it, and glass inside the app (sheets, the player bar) depends on
+   sampling what is behind it. */
+.plugin-app-window .plugin-native-app-frame { overflow: hidden; border-radius: 0 0 var(--plugin-window-radius, 12px) var(--plugin-window-radius, 12px); }
+.plugin-app-window.plugin-app-titlebar-hidden .plugin-native-app-frame { border-radius: var(--plugin-window-radius, 12px); }

@@ -1,0 +1,217 @@
+/* Base: tokens, wallpaper, menu bar, windows, Dock, Launchpad, System Settings.
+   The stylesheets are loaded in the order of their numbers; later files refine earlier ones. */
+@font-face { src: url(../assets/fonts/sf-pro-display_regular.woff2); font-family: 'SFPro-Regular'; }
+@font-face { src: url(../assets/fonts/PingFangSC-Regular.woff2); font-family: 'PingFang-Regular'; }
+@font-face { src: url(../assets/fonts/sf-pro-display_semibold.woff2); font-family: 'SFPro-Bold'; }
+@font-face { src: url(../assets/fonts/PingFangSC-Semibold.woff2); font-family: 'PingFang-Bold'; }
+:root {
+    --accent: #0a84ff;
+    --accent-rgb: 10, 132, 255;
+    --blur-heavy: blur(50px) saturate(180%);
+    --dock-size: 56px;
+    --lp-cols: 7;
+    --lp-rows: 5;
+}
+body.light-mode {
+    --acrylic-bg: rgba(246, 246, 246, 0.55);
+    --acrylic-border: 0.5px solid rgba(0, 0, 0, 0.15);
+    --solid-bg: #fafafa;
+    --card-bg: #ffffff;
+    --text-main: #222222;
+    --text-muted: #666666;
+    --mac-border: 1px solid rgba(0, 0, 0, 0.1);
+    --mac-border-light: 0.5px solid rgba(255, 255, 255, 0.5);
+    --input-bg: #ffffff;
+    --hover-bg: rgba(0, 0, 0, 0.05);
+    --menubar-bg: rgba(255,255,255, 0.3);
+    --menubar-text: #000000;
+    --window-shadow: 0 18px 100px 0 rgba(0,0,0,0.20), 0 0 1.5px 0 rgba(0,0,0,0.275);
+    --dock-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    --icon-bg-img: url('../assets/images/backgrounds/bg.white.svg');
+}
+body.dark-mode {
+    --acrylic-bg: rgba(40, 40, 40, 0.65);
+    --acrylic-border: 0.5px solid rgba(255, 255, 255, 0.15);
+    --solid-bg: #1e1e1e;
+    --card-bg: #2c2c2e;
+    --text-main: #ffffff;
+    --text-muted: #aaaaaa;
+    --mac-border: 1px solid rgba(255, 255, 255, 0.15);
+    --mac-border-light: 0.5px solid rgba(255, 255, 255, 0.15);
+    --input-bg: #1c1c1e;
+    --hover-bg: rgba(255, 255, 255, 0.1);
+    --menubar-bg: rgba(0, 0, 0, 0.3);
+    --menubar-text: #ffffff;
+    --window-shadow: 0 18px 100px 0 rgba(0,0,0,0.40), 0 0 1.5px 0 rgba(255,255,255,0.2);
+    --dock-shadow: 0 5px 15px rgba(0,0,0,0.4);
+    --icon-bg-img: url('../assets/images/backgrounds/bg.black.svg');
+}
+/* Synchronous first-paint theme. preload.js sets data-boot-theme before this
+   stylesheet/body can paint; applyTheme() removes it after live classes are correct. */
+html[data-boot-theme="light"] body {
+    --acrylic-bg: rgba(246,246,246,.55); --acrylic-border:.5px solid rgba(0,0,0,.15);
+    --solid-bg:#fafafa; --card-bg:#fff; --text-main:#222; --text-muted:#666;
+    --mac-border:1px solid rgba(0,0,0,.1); --mac-border-light:.5px solid rgba(255,255,255,.5);
+    --input-bg:#fff; --hover-bg:rgba(0,0,0,.05); --menubar-bg:rgba(255,255,255,.3); --menubar-text:#000;
+    --window-shadow:0 18px 100px 0 rgba(0,0,0,.20),0 0 1.5px 0 rgba(0,0,0,.275);
+    --dock-shadow:0 5px 15px rgba(0,0,0,.15); --icon-bg-img:url('../assets/images/backgrounds/bg.white.svg');
+}
+html[data-boot-theme="dark"] body {
+    --acrylic-bg:rgba(40,40,40,.65); --acrylic-border:.5px solid rgba(255,255,255,.15);
+    --solid-bg:#1e1e1e; --card-bg:#2c2c2e; --text-main:#fff; --text-muted:#aaa;
+    --mac-border:1px solid rgba(255,255,255,.15); --mac-border-light:.5px solid rgba(255,255,255,.15);
+    --input-bg:#1c1c1e; --hover-bg:rgba(255,255,255,.1); --menubar-bg:rgba(0,0,0,.3); --menubar-text:#fff;
+    --window-shadow:0 18px 100px 0 rgba(0,0,0,.40),0 0 1.5px 0 rgba(255,255,255,.2);
+    --dock-shadow:0 5px 15px rgba(0,0,0,.4); --icon-bg-img:url('../assets/images/backgrounds/bg.black.svg');
+}
+.mac-acrylic { background-color: var(--acrylic-bg) !important; backdrop-filter: var(--blur-heavy) !important; -webkit-backdrop-filter: var(--blur-heavy) !important; border: var(--acrylic-border) !important; color: var(--text-main) !important; }
+.window-shadow { box-shadow: var(--window-shadow) !important; }
+.scrollbar::-webkit-scrollbar { width: 6px; height: 6px; background: transparent; }
+.scrollbar::-webkit-scrollbar-track { background: transparent; }
+.scrollbar::-webkit-scrollbar-thumb { background: rgba(128,128,128,0.3); border-radius: 4px; }
+.scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(128,128,128,0.5); }
+* { user-select: none; -webkit-user-select: none; }
+img, svg { -webkit-user-drag: none; }
+input, textarea { user-select: auto; -webkit-user-select: auto; }
+body, html { margin: 0; padding: 0; width: 100%; height: 100%; font-family: 'SFPro-Regular', 'PingFang-Regular', -apple-system, sans-serif; overflow: hidden; color: var(--text-main); background: #000; }
+
+#wallpaper { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-image: var(--init-bg, url('../assets/images/sequoia.shape.day.jpg')); background-size: cover; background-position: center; z-index: 1; transition: background-image 0.5s ease; }
+
+.desktop-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 10; pointer-events: none; }
+.desktop-container .link-item { pointer-events: auto; width: 80px; }
+.desktop-container .link-icon { width: 64px; height: 64px; margin-bottom: 5px; }
+.desktop-container .link-name { color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
+#dock-container { z-index: 9999; position: absolute; bottom: 10px; width: 100%; display: flex; justify-content: center; pointer-events: none;}
+#dock-shell { position: relative; pointer-events: auto; }
+#launchpad { z-index: 8000; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; overflow: hidden;}
+.window { z-index: 6000; position: absolute; border-radius: 12px; display: flex; flex-direction: column; }
+#menu-bar { z-index: 5000; position: absolute; top: 0; left: 0; width: 100%; height: 26px; }
+#launchpad { background: rgba(0, 0, 0, 0.15); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); opacity: 0; pointer-events: none; transform: scale(1.05); transition: opacity 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
+#launchpad.active { opacity: 1; pointer-events: all; transform: scale(1); }
+#launchpad-grid { display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; width: 100%; height: 100%; box-sizing: border-box; padding-bottom: calc(var(--dock-size) + 80px); }
+#launchpad-grid::-webkit-scrollbar { display: none; } 
+.launchpad-page { min-width: 100vw; height: 100%; scroll-snap-align: start; display: grid; grid-template-columns: repeat(var(--lp-cols), 110px); grid-template-rows: repeat(var(--lp-rows), 130px); justify-content: center; align-content: center; gap: 4vh 4vw; padding: 60px 5%; box-sizing: border-box; }
+.lp-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; cursor: pointer; width: 110px; position: relative;}
+.lp-item:not(.jiggling):hover .app-icon-container { transform: scale(1.05); filter: brightness(90%); }
+.lp-name { color: white; font-size: 14px; text-shadow: 0 1px 3px rgba(0,0,0,0.8); font-family: 'SFPro-Regular', 'PingFang-Regular'; text-align: center; white-space: nowrap;}
+.lp-icon { width: 84px; height: 84px; margin-bottom: 8px; display: flex; justify-content: center; align-items: center; }
+@keyframes jiggle { 0% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } 100% { transform: rotate(-2deg); } }
+.jiggling { animation: jiggle 0.3s infinite; }
+.delete-badge { position: absolute; top: -5px; left: 5px; width: 22px; height: 22px; background: #ff5f57; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; cursor: pointer; z-index: 10; border: 1px solid rgba(0,0,0,0.2); box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+.delete-badge:hover { filter: brightness(0.8); transform: scale(1.1); }
+.launchpad-dots { position: absolute; bottom: calc(var(--dock-size) + 40px); width: 100%; display: flex; justify-content: center; gap: 10px; z-index: 8001; pointer-events: none; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.4); transition: background 0.2s; }
+.dot.active { background: rgba(255,255,255,0.9); }
+body.launchpad-open #menu-bar { opacity: 0; pointer-events: none; }
+#menu-bar { display: flex; justify-content: space-between; align-items: center; padding: 0 16px; box-sizing: border-box; font-size: 13px; color: var(--menubar-text); border: none; background-color: var(--menubar-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); transition: opacity 0.2s ease; }
+.menu-left span, .menu-right span { margin-inline-end: 18px; cursor: default; }
+.bold { font-family: 'SFPro-Bold', 'PingFang-Bold'; font-weight: bold; }
+.apple-logo { font-size: 16px; cursor: pointer; padding: 0 5px; }
+.dropdown-menu { position: absolute; top: 26px; left: 10px; width: 220px; border-radius: 8px; padding: 5px 0; z-index: 9999; display: flex; flex-direction: column; box-shadow: 0 5px 20px rgba(0,0,0,0.2); border: var(--mac-border-light); }
+.dropdown-menu.hidden { display: none; }
+.dropdown-menu .menu-item { padding: 6px 15px; font-size: 13px; cursor: default; }
+.dropdown-menu .menu-item:hover { background: var(--accent); color: #fff; }
+.menu-separator { height: 1px; background: var(--mac-border); margin: 4px 10px; }
+
+/* 回滚至 Source 3 完美的尺寸设定 */
+.app-icon-container { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transition: transform 0.2s cubic-bezier(0.25, 1, 0.25, 1); }
+.app-icon-container.external-with-bg .squircle-bg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 82%; height: 82%; background-image: var(--icon-bg-img); background-size: 100% 100%; background-position: center; background-repeat: no-repeat; z-index: 1; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.25)); }
+.app-icon-container.external-with-bg .squircle-icon { position: relative; z-index: 2; width: 52%; height: 52%; object-fit: contain; }
+.app-icon-container.external-no-bg .native-icon { width: 82%; height: 82%; object-fit: contain; border-radius: 22.5%; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+.app-icon-container .native-icon { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+
+#spotlight { width: 650px; max-height: 400px; }
+#search-form { display: flex; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--mac-border); position: relative; z-index: 25; }
+#search-form input { pointer-events: auto; color: var(--text-main); }
+.engine-dropdown-container { position: relative; display: flex; align-items: center; pointer-events: auto; margin-inline-end: 16px; cursor: pointer; }
+.search-icon { width: 24px; height: 24px; color: var(--text-main); transition: transform 0.2s; }
+.search-icon:hover { transform: scale(1.1); }
+#search-input { flex-grow: 1; border: none; background: transparent; outline: none; font-size: 24px; font-family: 'SFPro-Regular', 'PingFang-Regular'; box-sizing: border-box; }
+#search-input::placeholder { color: var(--text-muted); }
+/* No stacking context of its own: everything inside Spotlight is painted with the one glass surface. */
+#quick-links { display: flex; flex-wrap: wrap; justify-content: flex-start; align-content: flex-start; gap: 20px 30px; padding: 24px; overflow-y: auto; flex-grow: 1; }
+.link-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: var(--text-main); cursor: pointer; width: 68px; pointer-events: auto;}
+.link-item:hover .app-icon-container { transform: translateY(-3px) scale(1.05); }
+.link-icon { width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; position: relative; background: transparent; }
+.link-name { font-size: 12px; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center; margin-top: 8px;}
+.dragging { opacity: 0.5; filter: grayscale(1); }
+.drag-over { border: 2px dashed var(--accent) !important; border-radius: 12px; transform: scale(1.05); }
+
+/* 完全重写 Dock 样式，解决任何亚像素偏移 */
+/* The glass plate is a sibling behind the icon row. Magnification moves icons with
+   transforms only and widens just this plate, so the icon row itself is never laid out again. */
+#dock-plate { position: absolute; top: 0; bottom: 0; left: 0; right: 0; box-sizing: border-box; border-radius: calc(var(--dock-size) * 0.35); transition: left 0.17s cubic-bezier(0.2, 0.8, 0.2, 1), right 0.17s cubic-bezier(0.2, 0.8, 0.2, 1); }
+#dock-shell.is-tracking #dock-plate { transition: none; }
+#dock { position: relative; z-index: 1; display: flex; gap: 4px; padding: 5px 4px 11px; align-items: flex-end; height: calc(var(--dock-size) + 16px) !important; box-sizing: border-box; max-height: calc(var(--dock-size) + 16px) !important; width: max-content; }
+.dock-item { width: var(--dock-size); height: var(--dock-size); margin: 0; padding: 0; cursor: pointer; position: relative; display: flex; align-items: flex-end; justify-content: center; will-change: transform; }
+.dock-icon { width: var(--dock-size); height: var(--dock-size); flex: 0 0 var(--dock-size); display: flex; align-items: center; justify-content: center; position: relative; transform-origin: bottom center; will-change: transform; }
+#dock:not(:hover) .dock-item, #dock:not(:hover) .dock-separator { transition: transform 0.15s ease-out; }
+#dock:not(:hover) .dock-icon { transition: transform 0.15s ease-out; }
+.dock-item::after { content: attr(data-title); position: absolute; top: -35px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.6); color: white; padding: 4px 10px; border-radius: 6px; font-size: 12px; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.2s; z-index: 10;}
+.dock-item:hover::after { opacity: 1; }
+
+.window.hidden { display: none !important; }
+.window-controls { display: inline-flex; gap: 8px; z-index: 20;}
+.btn { width: 12px; height: 12px; border-radius: 50%; cursor: pointer; box-shadow: inset 0 0 0 0.5px rgba(0,0,0,0.1);}
+.close { background-color: #ff5f57; }
+.minimize { background-color: #febc2e; }
+.maximize { background-color: #28c840; }
+#about-window { width: 480px; height: 260px; justify-content: center;}
+#settings-window { width: 720px; height: 500px; }
+.settings-sidebar { width: 220px; display: flex; flex-direction: column; border-inline-end: none; position: relative; border-start-start-radius: 12px; border-start-end-radius: 0; border-end-end-radius: 0; border-end-start-radius: 12px; }
+.search-box-sidebar { padding: 0 15px 15px 15px; position: relative; z-index: 15; pointer-events: none;}
+.search-box-sidebar input { pointer-events: auto; width: 100%; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--mac-border); background: var(--hover-bg); outline: none; font-size: 12px; box-sizing: border-box; color: var(--text-main);}
+.settings-sidebar .tab { padding: 8px 15px; font-size: 13px; cursor: pointer; border-radius: 6px; margin: 2px 10px; font-weight: 500; transition: background 0.1s; position: relative; z-index: 15; pointer-events: auto;}
+.settings-sidebar .tab:hover { background: var(--hover-bg); }
+.settings-sidebar .tab.active { background: var(--accent); color: white; }
+.settings-main { flex: 1 1 0; background: var(--solid-bg); display: flex; flex-direction: column; overflow: hidden; border-start-start-radius: 0; border-start-end-radius: 12px; border-end-end-radius: 12px; border-end-start-radius: 0;}
+/* The page title is a frosted bar: the page scrolls underneath it and shows through, blurred.
+   What is blurred is the window's own content on its solid base, never the desktop. */
+.settings-main { position: relative; --settings-header-height: 57px; }
+.settings-header { padding: 20px 30px 10px 30px; border-bottom: 1px solid rgba(128,128,128,0.15); position: absolute; top: 0; inset-inline: 0; height: var(--settings-header-height); box-sizing: border-box; z-index: 20;
+    background: color-mix(in srgb, var(--solid-bg) 72%, transparent); -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%); }
+body.dev-reduce-transparency .settings-header, body.dev-transparent-glass .settings-header { background: var(--solid-bg); -webkit-backdrop-filter: none; backdrop-filter: none; }
+#settings-title { margin: 0; font-size: 18px; font-family: 'SFPro-Bold', 'PingFang-Bold'; }
+.settings-scroll-area { padding: calc(var(--settings-header-height, 57px) + 20px) 30px 20px; scroll-padding-top: calc(var(--settings-header-height, 57px) + 12px); overflow-y: auto; flex-grow: 1; position: relative; z-index: 15;}
+.set-panel { display: none; flex-direction: column; height: 100%; pointer-events: none; gap: 10px;}
+.set-panel.active { display: flex; }
+.set-panel h3 { margin-block: 5px 5px; margin-inline: 5px 0; font-size: 13px; font-family: 'SFPro-Bold', 'PingFang-Bold'; color: var(--text-muted); flex-shrink: 0;}
+.mac-card { pointer-events: auto; background: var(--card-bg); border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid rgba(128,128,128,0.2); margin-bottom: 15px; overflow: hidden; padding: 0 16px; flex-shrink: 0;}
+.list-card { display:flex; flex-direction:column; flex-grow: 1; min-height: 250px; }
+.card-row { padding: 12px 0; border-bottom: 1px solid rgba(128,128,128,0.1); display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 500; }
+.card-row:last-child { border-bottom: none; }
+.mac-btn { padding: 5px 14px; border: 1px solid rgba(128,128,128,0.3); border-radius: 6px; background: var(--input-bg); color: var(--text-main); cursor: pointer; outline: none; font-size: 12px; font-weight: 500; box-shadow: 0 1px 2px rgba(0,0,0,0.02); transition: all 0.1s; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center;}
+.mac-btn:active { filter: brightness(85%); }
+.mac-btn.blue { background: var(--accent); color: white; border: none; }
+.mac-btn.blue:active { background: color-mix(in srgb, var(--accent) 80%, #000); }
+.mac-custom-select { position: relative; width: auto; min-width: 100px; padding: 5px 10px; border: 1px solid rgba(128,128,128,0.3); border-radius: 6px; background: var(--input-bg); color: var(--text-main); font-size: 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box;}
+.mac-input { padding: 6px 10px; border: 1px solid rgba(128,128,128,0.3); border-radius: 6px; outline: none; font-size: 12px; background: var(--input-bg); color: var(--text-main); flex-grow: 1; box-sizing: border-box;}
+.mac-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(var(--accent-rgb),0.2); }
+.mac-switch { position: relative; display: inline-block; width: 36px; height: 20px; }
+.mac-switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: var(--hover-bg); border: 1px solid rgba(128,128,128,0.3); transition: .3s; border-radius: 20px; box-sizing: border-box;}
+.slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 1px; bottom: 1px; background-color: var(--text-main); transition: .3s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+input:checked + .slider { background-color: #34c759; border-color: transparent;}
+input:checked + .slider:before { transform: translateX(16px); background-color: white;}
+.edit-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; flex-grow: 1; overflow-y: auto; padding-inline-end: 5px; margin-top: 15px;}
+.add-box { display: flex; gap: 10px; align-items: center; padding-top: 10px; padding-bottom: 10px; border-top: 1px solid rgba(128,128,128,0.1); flex-shrink: 0;}
+.empty-placeholder { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; color: var(--text-main); font-size: 20px; }
+.empty-placeholder-dock { display: flex; align-items: center; justify-content: center; height: 100%; padding: 0 20px; color: var(--text-main); font-size: 14px; white-space: nowrap; }
+.edit-row { display: flex; align-items: center; justify-content: space-between; padding: 10px; background: var(--hover-bg); border-radius: 8px; border: 1px solid rgba(128,128,128,0.1); flex-shrink: 0; margin-bottom: 8px; transition: opacity 0.2s; }
+.edit-row.dragging { opacity: 0.5; filter: grayscale(1); }
+.edit-row.drag-over { border: 2px dashed var(--accent) !important; transform: scale(1.02); }
+.sys-tag { color: var(--text-muted); font-size: 11px; padding: 3px 8px; background: transparent; border-radius: 4px; white-space: nowrap;}
+.del-btn { background: #ff5f57; color: white; border: none; padding: 3px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; }
+.del-btn:hover { background: #d73229; }
+
+/* Platforms that draw classic scroll bars (Windows, Linux, ChromeOS — or macOS set to always
+   show them) get slim, rounded ones without arrow buttons, closer to the overlay scroll bars
+   of macOS. preload.js sets the class after measuring how the browser draws them. */
+html.classic-scrollbars *::-webkit-scrollbar { width: 11px; height: 11px; background: transparent; }
+html.classic-scrollbars *::-webkit-scrollbar-track { background: transparent; margin-top: var(--scroll-track-top, 0px); margin-bottom: var(--scroll-track-bottom, 0px); }
+html.classic-scrollbars *::-webkit-scrollbar-thumb { min-height: 32px; border: 3px solid transparent; border-radius: 8px; background: rgba(128,128,132,.42) padding-box; }
+html.classic-scrollbars *::-webkit-scrollbar-thumb:hover { border-width: 2px; background-color: rgba(128,128,132,.62); }
+html.classic-scrollbars *::-webkit-scrollbar-thumb:active { border-width: 2px; background-color: rgba(128,128,132,.75); }
+html.classic-scrollbars *::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
+html.classic-scrollbars *::-webkit-scrollbar-corner { background: transparent; }
+html.classic-scrollbars .scrollbar::-webkit-scrollbar { width: 9px; height: 9px; }

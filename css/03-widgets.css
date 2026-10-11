@@ -1,0 +1,846 @@
+/* Widget centre, desktop widgets, widget gallery and their dialogs.
+   The stylesheets are loaded in the order of their numbers; later files refine earlier ones. */
+/* V41 Widget Center, desktop widgets, gallery and confirmation UI */
+#clock { cursor: pointer; }
+.desktop-widget-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 8;
+    pointer-events: none;
+}
+.desktop-widget-layer .widget-card { pointer-events: auto; }
+.widget-center {
+    position: fixed;
+    top: 34px;
+    right: 12px;
+    bottom: 12px;
+    width: 372px;
+    z-index: 850000;
+    display: flex;
+    flex-direction: column;
+    border-radius: 20px;
+    padding: 18px 18px 14px;
+    box-sizing: border-box;
+    background: rgba(224, 224, 232, 0.48);
+    border: 1px solid rgba(255,255,255,0.38);
+    box-shadow: 0 18px 70px rgba(0,0,0,0.26), inset 0 0 0 0.5px rgba(255,255,255,0.2);
+    backdrop-filter: blur(34px) saturate(165%);
+    -webkit-backdrop-filter: blur(34px) saturate(165%);
+    color: #111;
+}
+body.dark-mode .widget-center {
+    background: rgba(45, 45, 52, 0.5);
+    color: #fff;
+    border-color: rgba(255,255,255,0.14);
+}
+.widget-center.hidden, .widget-gallery.hidden, .launchpad-delete-dialog.hidden { display: none !important; }
+.widget-center-header { flex: 0 0 auto; padding: 2px 4px 12px; }
+.widget-center-date { font-size: 26px; font-family: 'SFPro-Bold','PingFang-Bold'; font-weight: 700; }
+.widget-center-weekday { margin-top: 2px; font-size: 13px; opacity: 0.62; }
+.widget-center-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 2px 0 16px;
+}
+.widget-center-empty { flex: 1; display: flex; align-items: center; justify-content: center; opacity: 0.55; }
+.widget-edit-btn {
+    flex: 0 0 auto;
+    align-self: center;
+    border: 0;
+    border-radius: 999px;
+    padding: 8px 18px;
+    background: rgba(255,255,255,0.45);
+    color: inherit;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.15);
+    font: 13px 'SFPro-Regular','PingFang-Regular';
+    cursor: pointer;
+}
+body.dark-mode .widget-edit-btn { background: rgba(255,255,255,0.13); }
+
+.widget-card {
+    position: relative;
+    box-sizing: border-box;
+    overflow: hidden;
+    border-radius: 21px;
+    background: rgba(245,245,247,0.88);
+    color: #151515;
+    border: 0.5px solid rgba(0,0,0,0.12);
+    box-shadow: 0 5px 18px rgba(0,0,0,0.22);
+    padding: 14px;
+    flex: 0 0 auto;
+}
+body.dark-mode .widget-card {
+    background: rgba(36,36,39,0.9);
+    color: #f5f5f7;
+    border-color: rgba(255,255,255,0.12);
+}
+.widget-size-small { width: 160px; height: 160px; }
+.widget-size-medium { width: 332px; height: 160px; }
+.widget-size-large { width: 332px; height: 332px; }
+.desktop-widget {
+    position: absolute;
+    cursor: default;
+    backdrop-filter: blur(18px) saturate(145%);
+    -webkit-backdrop-filter: blur(18px) saturate(145%);
+}
+.desktop-widget-dragging { opacity: 0.86; cursor: grabbing; z-index: 99; }
+.widget-remove {
+    position: absolute;
+    z-index: 25;
+    top: -7px;
+    left: -7px;
+    width: 23px;
+    height: 23px;
+    border-radius: 50%;
+    border: 0.5px solid rgba(0,0,0,0.22);
+    background: rgba(247,247,247,0.96);
+    color: #666;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+    font-size: 20px;
+    line-height: 19px;
+    padding: 0;
+    cursor: pointer;
+}
+.widget-caption { font-size: 12px; opacity: 0.58; margin-top: 8px; text-align: center; }
+.widget-loading, .battery-unavailable, .photo-widget-empty { width: 100%; height: 100%; display:flex; align-items:center; justify-content:center; text-align:center; opacity:.58; font-size:12px; }
+
+/* Clocks */
+.widget-clock { display: flex; align-items: center; justify-content: center; }
+.widget-digital-time { font-size: 46px; line-height: 1; font-family:'SFPro-Bold','PingFang-Bold'; letter-spacing:-2px; }
+.analog-clock {
+    position: relative;
+    width: 112px;
+    height: 112px;
+    border-radius: 50%;
+    background: #f9f9f9;
+    border: 1px solid rgba(0,0,0,.16);
+    box-shadow: inset 0 0 12px rgba(0,0,0,.04);
+}
+body.dark-mode .analog-clock { background: #27272a; border-color: rgba(255,255,255,.12); }
+.clock-tick { position:absolute; top:5px; left:50%; width:2px; height:8px; margin-inline-start:-1px; background:#333; transform-origin: 1px 51px; border-radius:1px; }
+body.dark-mode .clock-tick { background:#eee; }
+.clock-hand { position:absolute; left:50%; bottom:50%; transform-origin: 50% 100%; border-radius:999px; }
+.hour-hand { width:4px; height:29px; margin-inline-start:-2px; background:#202020; }
+.minute-hand { width:3px; height:40px; margin-inline-start:-1.5px; background:#202020; }
+.second-hand { width:1.5px; height:44px; margin-inline-start:-.75px; background:#ff9500; }
+body.dark-mode .hour-hand, body.dark-mode .minute-hand { background:#f2f2f2; }
+.clock-pin { position:absolute; width:7px; height:7px; border-radius:50%; background:#ff9500; left:50%; top:50%; transform:translate(-50%,-50%); }
+.world-clock-grid { width:100%; height:100%; display:grid; grid-template-columns:repeat(4,1fr); align-items:center; gap:5px; }
+.world-clock-cell { display:flex; flex-direction:column; align-items:center; gap:4px; min-width:0; }
+.world-clock-cell .analog-clock { width:60px; height:60px; }
+.world-clock-cell .clock-tick { top:3px; height:4px; width:1px; transform-origin:.5px 27px; }
+.world-clock-cell .hour-hand { height:15px; width:2px; margin-inline-start:-1px; }
+.world-clock-cell .minute-hand { height:21px; width:1.5px; margin-inline-start:-.75px; }
+.world-clock-cell .second-hand { height:22px; width:1px; margin-inline-start:-.5px; }
+.world-clock-cell .clock-pin { width:4px; height:4px; }
+.world-clock-label { font-size:10px; font-family:'SFPro-Bold','PingFang-Bold'; max-width:70px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+/* Photos */
+.widget-photo { padding:0; background:#d7d7d9; }
+.photo-widget-frame { width:100%; height:100%; overflow:hidden; }
+.photo-widget-frame img { width:100%; height:100%; object-fit:cover; display:block; }
+
+/* Battery */
+.battery-widget-content { width:100%; height:100%; display:flex; align-items:center; justify-content:center; gap:12px; }
+.widget-size-small .battery-widget-content { flex-direction:column; gap:5px; }
+.battery-ring { --battery-level:270deg; width:72px; height:72px; border-radius:50%; position:relative; background: conic-gradient(#20c944 var(--battery-level), rgba(130,130,140,.35) 0); display:grid; place-items:center; }
+.battery-ring::after { content:''; position:absolute; inset:8px; border-radius:50%; background:rgba(245,245,247,.92); }
+body.dark-mode .battery-ring::after { background:rgba(36,36,39,.96); }
+.battery-device-icon { position:relative; z-index:2; font-size:30px; }
+.battery-percent { font-size:25px; }
+.widget-size-small .battery-percent { font-size:21px; }
+
+/* Weather */
+.widget-weather { color:#fff; background:linear-gradient(160deg, rgba(90,119,150,.92), rgba(124,141,159,.92)); border-color:rgba(255,255,255,.18); }
+.weather-widget-content { width:100%; height:100%; display:flex; flex-direction:column; }
+.weather-head { display:flex; justify-content:space-between; gap:12px; }
+.weather-location { font-size:14px; font-family:'SFPro-Bold','PingFang-Bold'; }
+.weather-temp { font-size:44px; line-height:1.05; font-weight:300; }
+.weather-condition { text-align: end; font-size:12px; font-family:'SFPro-Bold','PingFang-Bold'; }
+.weather-symbol { font-size:28px; line-height:1; }
+.weather-forecast-row { margin-top:auto; padding-top:9px; border-top:1px solid rgba(255,255,255,.2); display:flex; justify-content:space-between; gap:5px; }
+.weather-day { flex:1; text-align:center; font-size:10px; }
+.weather-day-icon { font-size:18px; margin:3px 0; }
+.widget-size-small .weather-forecast-row { display:none; }
+
+/* Screen Time */
+.widget-screenTime { background:rgba(250,250,250,.93); }
+body.dark-mode .widget-screenTime { background:rgba(40,40,42,.94); }
+.screen-time-content { width:100%; height:100%; display:flex; flex-direction:column; }
+.screen-time-total { font-size:29px; font-family:'SFPro-Bold','PingFang-Bold'; margin-bottom:8px; }
+.screen-time-bars { display:flex; flex-direction:column; gap:7px; overflow:hidden; }
+.screen-time-row { display:grid; grid-template-columns:minmax(58px,1fr) 1.2fr auto; gap:7px; align-items:center; font-size:10px; }
+.screen-time-host { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.screen-time-bar { position:relative; height:7px; background:rgba(120,120,128,.18); border-radius:999px; overflow:hidden; }
+.screen-time-bar::after { content:''; position:absolute; inset:0 auto 0 0; width:var(--usage); border-radius:inherit; background:var(--accent); }
+.screen-time-value { opacity:.62; white-space:nowrap; }
+.widget-size-small .screen-time-row:nth-child(n+4) { display:none; }
+
+/* Widget gallery */
+.widget-gallery { position:fixed; inset:0; z-index:850100; pointer-events:none; }
+.widget-gallery-shell {
+    position:absolute;
+    left:4.5vw;
+    bottom:4vh;
+    width:min(1050px,72vw);
+    height:min(650px,72vh);
+    display:grid;
+    grid-template-columns:220px 1fr;
+    border-radius:22px;
+    overflow:hidden;
+    pointer-events:auto;
+    background:rgba(229,208,240,.76) !important;
+}
+.widget-gallery-sidebar { padding:18px 12px; border-inline-end:1px solid rgba(0,0,0,.11); overflow-y:auto; }
+.widget-gallery-search-wrap { margin-bottom:16px; }
+#widget-gallery-search { width:100%; border:0; outline:0; border-radius:8px; padding:8px 10px; background:rgba(255,255,255,.28); color:inherit; font-size:12px; }
+.widget-gallery-category { width:100%; border:0; border-radius:9px; background:transparent; color:inherit; text-align: start; padding:9px 11px; margin:2px 0; font-size:13px; cursor:pointer; }
+.widget-gallery-category.active { background:rgba(112,70,178,.35); font-family:'SFPro-Bold','PingFang-Bold'; }
+.widget-gallery-main { position:relative; min-width:0; padding:20px 24px 54px; background:rgba(242,196,239,.5); overflow:hidden; }
+.widget-gallery-title { font-size:16px; font-family:'SFPro-Bold','PingFang-Bold'; margin-bottom:15px; }
+.widget-gallery-grid { height:calc(100% - 42px); overflow:auto; display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); align-content:start; gap:22px; padding:4px 5px 30px; }
+.widget-gallery-item { min-height:190px; display:flex; flex-direction:column; align-items:center; gap:8px; cursor:grab; }
+.widget-gallery-item:active { cursor:grabbing; }
+.widget-gallery-item .widget-card { transform:scale(.72); transform-origin:top center; margin-bottom:-44px; }
+.widget-gallery-item .widget-size-medium { transform:scale(.52); margin-bottom:-70px; }
+.widget-gallery-item .widget-size-large { transform:scale(.44); margin-bottom:-176px; }
+.widget-preview { pointer-events:none; }
+.widget-preview-title { display:none; }
+.widget-gallery-item-label { font-size:12px; text-align:center; }
+.widget-gallery-hint { position:absolute; left:24px; bottom:17px; opacity:.64; font-size:11px; }
+.widget-gallery-done { position:absolute; right:22px; bottom:14px; }
+body.widget-drag-active #desktop-widget-layer { outline:2px dashed rgba(var(--accent-rgb),.45); outline-offset:-10px; pointer-events:auto; }
+body.widget-drag-active #widget-center-list { outline:2px dashed rgba(var(--accent-rgb),.55); outline-offset:-5px; border-radius:14px; }
+
+/* Settings widget management */
+.widget-field-label { width:90px; flex:0 0 90px; font-size:12px; }
+.compact-number { max-width:90px; flex-grow:0; }
+.widget-management-list, .widget-limit-list { margin-top:0; }
+.widget-management-row, .widget-limit-row { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:8px 4px; border-bottom:1px solid rgba(128,128,128,.12); font-size:11px; }
+
+/* Launchpad delete confirmation, above Launchpad and Dock. */
+.launchpad-delete-dialog { position:fixed; inset:0; z-index:1000010; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,.06); }
+.launchpad-delete-card { width:520px; min-height:118px; border-radius:17px; padding:18px 20px; box-sizing:border-box; display:grid; grid-template-columns:82px 1fr; grid-template-rows:1fr auto; gap:12px 18px; background:rgba(218,165,236,.9) !important; }
+.launchpad-delete-icon { grid-row:1 / span 2; width:72px; height:72px; align-self:center; }
+.launchpad-delete-message { align-self:center; font-size:17px; line-height:1.35; font-family:'SFPro-Bold','PingFang-Bold'; }
+.launchpad-delete-actions { display:flex; justify-content:flex-end; gap:10px; }
+.launchpad-delete-actions .mac-btn { min-width:82px; }
+
+/* Screen-time limit page */
+.limit-page { min-height:100%; display:grid; place-items:center; background:linear-gradient(160deg,#d9e7f7,#cab7ee); }
+.limit-card { width:min(480px,calc(100vw - 40px)); padding:36px; border-radius:22px; text-align:center; }
+.limit-icon { font-size:54px; }
+.limit-card h1 { margin:12px 0 6px; font-size:25px; }
+.limit-card p { color:var(--text-muted); }
+
+@media (max-width: 850px) {
+    .widget-center { width:350px; }
+    .widget-gallery-shell { width:92vw; grid-template-columns:180px 1fr; }
+}
+.widget-battery {
+    background: rgba(176,176,186,0.58);
+    backdrop-filter: blur(24px) saturate(145%);
+    -webkit-backdrop-filter: blur(24px) saturate(145%);
+}
+body.dark-mode .widget-battery { background: rgba(92,92,102,0.52); }
+
+/* V42 — Widget system fidelity/stability pass */
+body.widget-gallery-open #dock-container {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .12s ease;
+}
+body.widget-gallery-open #desktop-grid {
+    pointer-events: none !important;
+}
+
+/* Notification Center is not one giant glass sheet: widgets float directly over the desktop. */
+.widget-center {
+    top: 34px;
+    right: 12px;
+    bottom: 12px;
+    width: 360px;
+    padding: 14px 8px 12px;
+    border: 0 !important;
+    border-radius: 0;
+    background: transparent !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    color: var(--menubar-text);
+    text-shadow: 0 1px 2px rgba(0,0,0,.18);
+}
+body.dark-mode .widget-center {
+    background: transparent !important;
+    color: var(--menubar-text);
+    border: 0;
+}
+.widget-center-header { padding: 0 8px 12px; }
+.widget-center-list {
+    display: grid;
+    grid-template-columns: 160px 160px;
+    grid-auto-flow: row;
+    grid-auto-rows: auto;
+    align-content: start;
+    align-items: start;
+    justify-content: start;
+    gap: 12px;
+    padding: 2px 6px 18px;
+    overflow-y: auto;
+    overflow-x: visible;
+}
+.widget-center-list > .widget-size-small { grid-column: span 1; }
+.widget-center-list > .widget-size-medium,
+.widget-center-list > .widget-size-large { grid-column: 1 / span 2; }
+.widget-center-empty { grid-column: 1 / span 2; min-height: 240px; }
+.widget-edit-btn {
+    background: var(--acrylic-bg) !important;
+    border: var(--acrylic-border) !important;
+    backdrop-filter: var(--blur-heavy);
+    -webkit-backdrop-filter: var(--blur-heavy);
+    color: var(--text-main);
+    text-shadow: none;
+}
+body.dark-mode .widget-edit-btn { background: var(--acrylic-bg) !important; }
+
+/* Every widget uses the same Spotlight-style acrylic material. */
+.widget-card,
+.mac-widget-glass,
+.widget-weather,
+.widget-screenTime,
+.widget-battery {
+    overflow: visible;
+    background: var(--acrylic-bg) !important;
+    color: var(--text-main) !important;
+    border: var(--acrylic-border) !important;
+    box-shadow: var(--window-shadow) !important;
+    backdrop-filter: var(--blur-heavy) !important;
+    -webkit-backdrop-filter: var(--blur-heavy) !important;
+    text-shadow: none;
+}
+body.dark-mode .widget-card,
+body.dark-mode .mac-widget-glass,
+body.dark-mode .widget-weather,
+body.dark-mode .widget-screenTime,
+body.dark-mode .widget-battery {
+    background: var(--acrylic-bg) !important;
+    color: var(--text-main) !important;
+    border: var(--acrylic-border) !important;
+}
+.widget-weather .weather-condition,
+.widget-weather .weather-location,
+.widget-weather .weather-temp,
+.widget-weather .weather-day { color: var(--text-main); }
+.weather-forecast-row { border-top-color: rgba(128,128,128,.25); }
+.widget-remove {
+    top: -9px;
+    left: -9px;
+    width: 22px;
+    height: 22px;
+    line-height: 18px;
+    z-index: 100;
+}
+.widget-center-dragging { opacity: .42; }
+.desktop-widget-dragging { opacity: .72; }
+
+/* Photo widgets keep the old frame visible until the next image is decoded, then cross-fade. */
+.widget-photo { padding: 0; }
+.photo-widget-frame {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 20px;
+    background: transparent;
+}
+.photo-widget-frame img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    opacity: 1;
+    transition: opacity .34s ease;
+}
+.photo-widget-frame img.photo-next { opacity: 0; z-index: 2; }
+.photo-widget-frame img.photo-next.photo-visible { opacity: 1; }
+.photo-widget-frame img.photo-current.photo-fading { opacity: 0; }
+.photo-widget-empty { padding: 12px; box-sizing: border-box; }
+
+/* Battery: macOS-style circular level ring with a fitted laptop outline. */
+.battery-widget-content { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+.widget-size-small .battery-widget-content { flex-direction: column; gap: 5px; }
+.battery-ring {
+    --battery-level: 0deg;
+    width: 78px;
+    height: 78px;
+    border-radius: 50%;
+    position: relative;
+    background: conic-gradient(#20d34a var(--battery-level), rgba(128,128,138,.27) 0);
+    display: grid;
+    place-items: center;
+}
+.battery-ring::after {
+    content: '';
+    position: absolute;
+    inset: 10px;
+    border-radius: 50%;
+    background: rgba(70,70,75,.72);
+    backdrop-filter: blur(18px) saturate(130%);
+    -webkit-backdrop-filter: blur(18px) saturate(130%);
+}
+body.light-mode .battery-ring::after { background: rgba(255,255,255,.38); }
+.battery-ring:not(.active) { background: rgba(128,128,138,.22); }
+.battery-ring:not(.active)::after { background: transparent; inset: 8px; border: 7px solid rgba(128,128,138,.24); }
+.battery-device-svg {
+    position: relative;
+    z-index: 2;
+    width: 46px;
+    height: 36px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+.battery-percent { font-size: 22px; line-height: 1; }
+.battery-slots { width: 100%; display: grid; grid-template-columns: repeat(4, 1fr); align-items: start; gap: 6px; }
+.battery-slot { display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 0; }
+.battery-slot .battery-ring { width: 62px; height: 62px; }
+.battery-slot .battery-ring::after { inset: 8px; }
+.battery-slot .battery-device-svg { width: 37px; height: 29px; stroke-width: 3.2; }
+.battery-slot .battery-percent { font-size: 17px; }
+
+/* Analog clocks initialize their hands before insertion; faces retain macOS clock-face contrast. */
+.widget-clock { overflow: visible; }
+.analog-clock { flex: 0 0 auto; }
+
+/* Widget gallery: Spotlight acrylic, no purple material, and no opaque drag plate. */
+.widget-gallery { z-index: 1000200; }
+.widget-gallery-shell {
+    left: 5.5vw;
+    bottom: 5.5vh;
+    width: min(1040px, 69vw);
+    height: min(640px, 70vh);
+    background: var(--acrylic-bg) !important;
+    border: var(--acrylic-border) !important;
+    backdrop-filter: var(--blur-heavy) !important;
+    -webkit-backdrop-filter: var(--blur-heavy) !important;
+    box-shadow: var(--window-shadow) !important;
+}
+.widget-gallery-sidebar,
+.widget-gallery-main {
+    background: transparent !important;
+    color: var(--text-main);
+}
+.widget-gallery-sidebar { border-inline-end: var(--mac-border); }
+.widget-gallery-category.active { background: rgba(var(--accent-rgb),.78); color: #fff; }
+.widget-gallery-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+.widget-gallery-item { background: transparent !important; }
+.widget-gallery-item .widget-card { box-shadow: 0 5px 18px rgba(0,0,0,.18) !important; }
+body.widget-drag-active #desktop-widget-layer,
+body.widget-drag-active #widget-center-list { outline: none !important; }
+.widget-drag-image-host {
+    position: fixed;
+    left: -10000px;
+    top: -10000px;
+    width: max-content;
+    height: max-content;
+    pointer-events: none;
+    z-index: 2147483647;
+    background: transparent !important;
+}
+.widget-drag-image-host .widget-drag-image {
+    transform: none !important;
+    margin: 0 !important;
+    opacity: .92;
+}
+
+/* Weather location search and per-widget routing. */
+.weather-search-box { align-items: center; }
+.weather-search-results { display: flex; flex-direction: column; gap: 4px; margin: 4px 0 10px; }
+.weather-search-result {
+    border: 0;
+    border-radius: 8px;
+    padding: 8px 10px;
+    background: var(--hover-bg);
+    color: var(--text-main);
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    text-align: start;
+    cursor: pointer;
+}
+.weather-search-result:hover { background: rgba(var(--accent-rgb),.18); }
+.weather-result-add { color: var(--accent); font-weight: 600; }
+.widget-subtitle { font-size: 12px; font-weight: 600; margin: 8px 2px 5px; }
+.widget-location-list { display: flex; flex-direction: column; }
+.widget-location-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 2px; border-top: 1px solid rgba(128,128,128,.13); }
+.widget-location-name { font-size: 12px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.widget-location-actions { display: flex; gap: 6px; flex: 0 0 auto; }
+.widget-location-default.active { color: var(--accent); }
+.widget-settings-hint, .widget-settings-muted { font-size: 11px; color: var(--text-muted); line-height: 1.45; }
+.widget-settings-hint { margin: 8px 2px 2px; }
+.widget-management-row { flex-wrap: wrap; }
+.widget-manager-weather-location { max-width: 150px; font-size: 11px; }
+
+/* Independent photo-widget controls and macOS-style square checkboxes. */
+#widget-photo-target { max-width: 230px; }
+.photo-interval-controls { display: flex; gap: 7px; align-items: center; }
+.photo-interval-controls select { width: 94px; }
+.photo-schedule-row.disabled,
+.photo-event-controls.disabled { opacity: .48; }
+.photo-event-controls { padding: 4px 12px 10px; }
+.mac-checkbox-row { display: flex; align-items: center; gap: 9px; padding: 6px 0; font-size: 12px; cursor: pointer; }
+.mac-checkbox {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border: 1px solid rgba(100,100,105,.48);
+    border-radius: 4px;
+    background: rgba(255,255,255,.32);
+    display: grid;
+    place-items: center;
+    margin: 0;
+    cursor: pointer;
+}
+.mac-checkbox:checked { background: var(--accent); border-color: var(--accent); }
+.mac-checkbox:checked::after { content: '✓'; color: white; font-size: 12px; font-weight: 700; line-height: 1; }
+.mac-checkbox:disabled { cursor: default; }
+
+@media (max-width: 900px) {
+    .widget-center { width: 348px; }
+    .widget-center-list { grid-template-columns: 160px 160px; gap: 10px; padding-inline-start: 4px; padding-inline-end: 4px; }
+    .widget-gallery-shell { width: 64vw; grid-template-columns: 180px 1fr; }
+}
+/* Keep edit badges visible inside scroll containers. */
+.widget-remove { top: 5px; left: 5px; }
+.widget-center-list.empty { display: none; }
+.widget-gallery-shell { width: min(1040px, calc(94.5vw - 392px)); min-width: 560px; }
+@media (max-width: 980px) {
+    .widget-gallery-shell { left: 18px; width: calc(100vw - 410px); min-width: 0; grid-template-columns: 165px 1fr; }
+}
+
+/* V43 — Launchpad composition, glass dialogs, and widget select consistency */
+#launchpad {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    isolation: isolate;
+}
+.launchpad-wallpaper-layer {
+    position: absolute;
+    inset: -42px;
+    z-index: 0;
+    pointer-events: none;
+    background-image: var(--init-bg, url('../assets/images/sequoia.shape.day.jpg'));
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transform: scale(1.065);
+    filter: blur(30px) saturate(118%) brightness(82%);
+    will-change: filter, transform;
+}
+.launchpad-dim-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: rgba(0,0,0,.10);
+}
+.launchpad-search-wrap { z-index: 4 !important; }
+#launchpad-grid { z-index: 2; }
+.launchpad-dots { z-index: 3 !important; }
+
+/* Launchpad confirmation uses the same acrylic material as Spotlight. */
+.launchpad-delete-dialog {
+    background: rgba(0,0,0,.035) !important;
+}
+.launchpad-delete-card {
+    background: var(--acrylic-bg) !important;
+    border: var(--acrylic-border) !important;
+    color: var(--text-main) !important;
+    box-shadow: var(--window-shadow) !important;
+    backdrop-filter: var(--blur-heavy) !important;
+    -webkit-backdrop-filter: var(--blur-heavy) !important;
+}
+
+/* Native <select> popups in Widget settings are replaced by our acrylic menu. */
+.glass-select-source { display: none !important; }
+.widget-glass-select {
+    min-width: 132px;
+    max-width: 240px;
+    gap: 16px;
+    background: var(--input-bg);
+}
+.widget-glass-select.disabled,
+.mac-custom-select.disabled {
+    opacity: .46;
+    pointer-events: none;
+}
+.glass-select-option {
+    position: relative;
+    padding-inline-start: 28px !important;
+}
+.glass-select-option.selected::before {
+    content: '✓';
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 11px;
+    font-weight: 700;
+}
+.glass-select-option.disabled {
+    opacity: .42;
+    pointer-events: none;
+}
+
+/* V44 — Widget grid, contextual editing, notification-center width, and Screen Time fidelity */
+
+/* Notification Center uses a wider macOS-like placement field. It remains scrollable
+   when needed, but the scrollbar itself is intentionally invisible. */
+.widget-center {
+    width: 548px;
+    right: 10px;
+    padding: 14px 10px 12px;
+}
+.widget-center-list {
+    grid-template-columns: repeat(3, 160px);
+    grid-auto-rows: 160px;
+    grid-auto-flow: dense;
+    gap: 12px;
+    justify-content: end;
+    padding: 2px 6px 18px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+.widget-center-list::-webkit-scrollbar { width: 0 !important; height: 0 !important; display: none !important; }
+.widget-center-list > .widget-size-small { grid-column: span 1; grid-row: span 1; }
+.widget-center-list > .widget-size-medium { grid-column: span 2; grid-row: span 1; }
+.widget-center-list > .widget-size-large { grid-column: span 2; grid-row: span 2; }
+.widget-center-empty { grid-column: 1 / -1; min-height: 180px; }
+.widget-center-list.empty { display: grid !important; }
+.widget-center-list.widget-drop-target::after {
+    content: '';
+    grid-column: span 1;
+    width: 160px;
+    height: 160px;
+    border-radius: 18px;
+    border: 2px solid rgba(150,150,155,.55);
+    background: rgba(128,128,132,.16);
+    box-sizing: border-box;
+}
+@media (max-width: 1050px) {
+    .widget-center { width: 376px; }
+    .widget-center-list { grid-template-columns: repeat(2, 160px); }
+}
+
+/* macOS widgets use tighter corners than application windows. */
+.widget-card { border-radius: 18px !important; }
+.photo-widget-frame { border-radius: 18px !important; }
+.widget-photo { border-radius: 18px !important; }
+
+/* Dragging never dims the widget itself. Placement is communicated with a separate
+   translucent grid target, matching the desktop hint macOS shows before drop. */
+.desktop-widget-dragging,
+.widget-center-dragging,
+.widget-drag-image-host .widget-drag-image { opacity: 1 !important; }
+.widget-placement-ghost {
+    position: absolute;
+    pointer-events: none;
+    z-index: 7;
+    border-radius: 18px;
+    box-sizing: border-box;
+    border: 3px solid rgba(170,170,175,.62);
+    background: rgba(150,150,155,.16);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.18);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+}
+.widget-placement-ghost.hidden { display: none !important; }
+
+/* Widget contextual menu */
+.widget-context-menu {
+    position: fixed;
+    z-index: 1000600;
+    width: 214px;
+    padding: 6px;
+    border-radius: 12px;
+    color: var(--text-main);
+}
+.widget-context-menu.hidden { display: none !important; }
+.widget-context-item {
+    position: relative;
+    width: 100%;
+    min-height: 30px;
+    border: 0;
+    border-radius: 7px;
+    padding: 6px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: transparent;
+    color: inherit;
+    text-align: start;
+    font: 13px 'SFPro-Regular','PingFang-Regular',sans-serif;
+    cursor: default;
+}
+button.widget-context-item:hover,
+.widget-context-has-submenu:hover { background: var(--accent); color: #fff; }
+.widget-context-item.danger { color: #ff453a; }
+.widget-context-item.danger:hover { color: #fff; background: #ff453a; }
+.widget-context-separator { height: 1px; margin: 5px 7px; background: rgba(128,128,128,.25); }
+.widget-context-chevron { margin-inline-start: auto; font-size: 18px; line-height: 1; }
+.widget-context-submenu {
+    position: absolute;
+    display: none;
+    left: calc(100% - 2px);
+    top: -6px;
+    width: 132px;
+    padding: 6px;
+    border-radius: 12px;
+    color: var(--text-main);
+}
+.widget-context-has-submenu:hover > .widget-context-submenu { display: block; }
+.widget-context-submenu .selected::before { content: '✓'; margin-inline-end: 7px; }
+
+/* Compact in-place widget editor */
+.widget-quick-editor {
+    position: fixed;
+    inset: 0;
+    z-index: 1000700;
+    display: grid;
+    place-items: center;
+    background: rgba(0,0,0,.09);
+}
+.widget-quick-editor.hidden { display: none !important; }
+.widget-quick-editor-card {
+    width: min(430px, calc(100vw - 40px));
+    max-height: min(580px, calc(100vh - 60px));
+    overflow: auto;
+    border-radius: 17px;
+    padding: 18px;
+    box-sizing: border-box;
+}
+.widget-quick-editor-title { font-size: 18px; font-weight: 700; margin: 2px 2px 16px; }
+.widget-quick-editor-fields { display: flex; flex-direction: column; gap: 14px; }
+.widget-quick-field { display: flex; flex-direction: column; gap: 7px; }
+.widget-quick-label { color: var(--text-muted); font-size: 12px; font-weight: 600; }
+.widget-quick-choice-row { display: flex; flex-wrap: wrap; gap: 7px; }
+.widget-quick-choice {
+    border: 1px solid rgba(128,128,132,.25);
+    border-radius: 8px;
+    padding: 7px 12px;
+    background: var(--hover-bg);
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+}
+.widget-quick-choice.selected { background: var(--accent); border-color: var(--accent); color: #fff; }
+.widget-quick-info { font-size: 12px; line-height: 1.5; color: var(--text-muted); }
+.widget-quick-open-full { align-self: flex-start; }
+.widget-quick-editor-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+
+/* Screen Time widget: total + hourly stacked activity + leading website list. */
+.widget-screenTime { padding: 13px !important; }
+.screen-time-content { overflow: hidden; }
+.screen-time-total { font-size: 27px; font-weight: 500; margin: 0 0 7px; letter-spacing: -.5px; }
+.screen-time-visual-body {
+    min-height: 0;
+    flex: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 118px;
+    gap: 10px;
+}
+.widget-size-small .screen-time-visual-body { grid-template-columns: 1fr; }
+.screen-time-hourly-chart {
+    height: 86px;
+    min-width: 0;
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    border-bottom: 1px solid rgba(128,128,132,.26);
+    background:
+        linear-gradient(to bottom, transparent 49%, rgba(128,128,132,.18) 50%, transparent 51%);
+}
+.screen-time-hour-col { flex: 1 1 0; height: 100%; min-width: 2px; display: flex; flex-direction: column; justify-content: flex-end; align-items: stretch; position: relative; }
+.screen-time-hour-stack { width: 100%; height: var(--hour-height); min-height: 0; display: flex; flex-direction: column-reverse; overflow: hidden; border-radius: 2px 2px 0 0; }
+.screen-time-segment { display: block; flex: 0 0 calc(var(--segment-ratio) * 100%); min-height: 0; }
+.screen-time-segment.productivity { background: var(--accent); }
+.screen-time-segment.entertainment { background: #64d2ff; }
+.screen-time-segment.social { background: #ff9f0a; }
+.screen-time-segment.other { background: #636366; }
+.screen-time-site-list { border-inline-start: 1px solid rgba(128,128,132,.18); padding-inline-start: 9px; display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+.screen-time-site-item { display: grid; grid-template-columns: 19px minmax(0,1fr) auto; align-items: center; gap: 6px; font-size: 9px; min-width: 0; }
+.screen-time-site-icon { width: 19px; height: 19px; border-radius: 5px; object-fit: cover; }
+.screen-time-site-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.screen-time-site-duration { opacity: .58; white-space: nowrap; }
+.widget-size-small .screen-time-total { font-size: 25px; }
+.widget-size-small .screen-time-hourly-chart { height: 92px; }
+.widget-size-large .screen-time-visual-body { grid-template-columns: minmax(0,1fr) 135px; }
+.widget-size-large .screen-time-hourly-chart { height: 220px; }
+
+/* Dedicated App & Website Activity settings */
+.screen-time-settings-panel { padding-bottom: 26px; }
+.screen-time-settings-hero { display: flex; align-items: center; justify-content: space-between; margin: 0 2px 14px; }
+.screen-time-settings-hero h3 { margin: 0; font-size: 16px; color: var(--text-main); }
+.screen-time-updated { margin-top: 3px; font-size: 11px; color: var(--text-muted); }
+.screen-time-manager-card { padding: 16px 16px 12px !important; }
+.screen-time-manager-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.screen-time-manager-label { font-size: 13px; font-weight: 600; }
+.screen-time-manager-total { font-size: 34px; margin-top: 3px; font-weight: 500; }
+.screen-time-manager-date { font-size: 13px; font-weight: 600; margin-top: 3px; }
+.screen-time-manager-chart { margin-top: 14px; height: 180px; }
+.screen-time-hourly-chart.manager { height: 180px; gap: 4px; }
+.screen-time-hourly-chart.manager .screen-time-hour-col { padding-bottom: 18px; box-sizing: border-box; }
+.screen-time-hour-label { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); font-size: 9px; color: var(--text-muted); }
+.screen-time-legend { display: flex; gap: 18px; margin-top: 10px; color: var(--text-muted); font-size: 10px; }
+.screen-time-legend span::before { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-inline-end: 5px; }
+.legend-productivity::before { background: var(--accent); }
+.legend-entertainment::before { background: #64d2ff; }
+.legend-social::before { background: #ff9f0a; }
+.legend-other::before { background: #636366; }
+.screen-time-sites-card { padding: 0 !important; overflow: hidden; }
+.screen-time-manager-sites { display: flex; flex-direction: column; }
+.screen-time-manager-site-row { min-height: 45px; display: grid; grid-template-columns: 28px minmax(0,1fr) 86px 86px; align-items: center; gap: 9px; padding: 7px 12px; border-bottom: 1px solid rgba(128,128,132,.14); box-sizing: border-box; }
+.screen-time-manager-site-row:last-child { border-bottom: 0; }
+.screen-time-manager-site-icon { width: 28px; height: 28px; border-radius: 7px; }
+.screen-time-manager-site-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; }
+.screen-time-manager-site-value, .screen-time-manager-site-limit { text-align: end; font-size: 11px; color: var(--text-muted); }
+.screen-time-limit-add { align-items: center; }
+.limit-duration-field { display: flex; align-items: center; gap: 6px; color: var(--text-muted); font-size: 11px; white-space: nowrap; }
+
+/* Replaces the old colored fallback page. Normal web pages use the injected opaque blur overlay. */
+.limit-page {
+    background: #f2f2f4 !important;
+    color: #1c1c1e;
+}
+.limit-card {
+    background: rgba(255,255,255,.72) !important;
+    border: 1px solid rgba(128,128,132,.22) !important;
+    backdrop-filter: blur(28px) saturate(70%) !important;
+    -webkit-backdrop-filter: blur(28px) saturate(70%) !important;
+}
+@media (prefers-color-scheme: dark) {
+    .limit-page { background: #1f2023 !important; color: #f5f5f7; }
+    .limit-card { background: rgba(42,42,45,.78) !important; }
+}
+.screen-time-manager-week { height: 94px; margin-top: 12px; }
+.screen-time-week-chart { width: 100%; height: 100%; display: grid; grid-template-columns: repeat(7,1fr); gap: 8px; align-items: end; border-bottom: 1px solid rgba(128,128,132,.22); }
+.screen-time-week-col { height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: stretch; gap: 4px; }
+.screen-time-week-bar { height: var(--week-height,0%); min-height: 0; border-radius: 4px 4px 0 0; background: rgba(99,99,102,.7); }
+.screen-time-week-col:last-child .screen-time-week-bar { background: var(--accent); }
+.screen-time-week-label { text-align: center; font-size: 9px; color: var(--text-muted); }
+.screen-time-week-col.muted { opacity: .25; }
+.screen-time-manager-sites-header { display:grid; grid-template-columns:minmax(0,1fr) 86px 86px; gap:9px; padding:8px 12px; margin-inline-start:37px; font-size:10px; font-weight:600; color:var(--text-muted); border-bottom:1px solid rgba(128,128,132,.14); }
+.screen-time-manager-sites-header span:nth-child(n+2) { text-align: end; }
+.screen-time-hourly-chart:not(.manager) { margin-bottom: 13px; overflow: visible; }
+.screen-time-hourly-chart:not(.manager) .screen-time-hour-label { bottom: -13px; }

@@ -1,0 +1,136 @@
+{
+  "id": "music",
+  "name": "Music",
+  "version": "2.13.1",
+  "kind": "app",
+  "runtime": "native",
+  "bundled": true,
+  "description": "Your own music library: import songs and videos, browse by artist and album, build playlists and playlist folders with covers, shuffle, repeat, queue, history, a full Now Playing view, and export.",
+  "icon": "assets/icon.png",
+  "accentColor": "red",
+  "settings": true,
+  "permissions": [
+    "storage",
+    "files",
+    "audio",
+    "notifications",
+    "statusItem",
+    "widgets"
+  ],
+  "window": {
+    "width": 980,
+    "height": 640,
+    "minWidth": 760,
+    "minHeight": 460,
+    "resizable": true,
+    "appearance": "system",
+    "material": "glass",
+    "borderRadius": 12,
+    "titlebar": "hidden"
+  },
+  "entry": {
+    "ui": "src/ui.json",
+    "script": [
+      "src/state.js",
+      "src/views.js",
+      "src/library.js",
+      "src/playback.js",
+      "src/main.js"
+    ]
+  },
+  "locales": {
+    "en-US": "locales/en-US.json",
+    "zh-CN": "locales/zh-CN.json",
+    "ja-JP": "locales/ja-JP.json",
+    "ar": "locales/ar.json",
+    "ko-KR": "locales/ko-KR.json"
+  },
+  "menus": [
+    {
+      "title": "File",
+      "titleKey": "menuFile",
+      "items": [
+        {
+          "label": "Import Songs…",
+          "labelKey": "menuImportSongs",
+          "command": "import-songs",
+          "shortcut": "⌥⌘O"
+        },
+        {
+          "label": "New Playlist",
+          "labelKey": "newPlaylist",
+          "command": "new-playlist",
+          "shortcut": "⌥⌘N"
+        },
+        {
+          "label": "New Playlist Folder",
+          "labelKey": "menuNewFolder",
+          "command": "new-folder",
+          "shortcut": "⇧⌥⌘N"
+        },
+        {
+          "separator": true
+        },
+        {
+          "label": "Export Playlist…",
+          "labelKey": "exportPlaylist",
+          "command": "export-playlist",
+          "shortcut": "⌥⌘E"
+        }
+      ]
+    },
+    {
+      "title": "Controls",
+      "titleKey": "menuControls",
+      "items": [
+        {
+          "label": "Play / Pause",
+          "labelKey": "menuPlayPause",
+          "command": "toggle"
+        },
+        {
+          "label": "Next",
+          "labelKey": "menuNext",
+          "command": "next",
+          "shortcut": "⌥⌘→"
+        },
+        {
+          "label": "Previous",
+          "labelKey": "menuPrevious",
+          "command": "previous",
+          "shortcut": "⌥⌘←"
+        },
+        {
+          "separator": true
+        },
+        {
+          "label": "Shuffle",
+          "labelKey": "menuShuffle",
+          "command": "shuffle",
+          "shortcut": "⌥⌘S"
+        },
+        {
+          "label": "Repeat",
+          "labelKey": "menuRepeat",
+          "command": "repeat",
+          "shortcut": "⌥⌘R"
+        }
+      ]
+    }
+  ],
+  "widgets": [
+    {
+      "id": "recent",
+      "title": "Recently Played",
+      "titleKey": "widgetRecent",
+      "sizes": [
+        "small",
+        "medium",
+        "large"
+      ]
+    }
+  ],
+  "urlSchemes": [
+    "music"
+  ]
+}
